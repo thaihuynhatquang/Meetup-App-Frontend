@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
+import ProfileBody from '../components/Profile/ProfileBody';
+
 import Colors from '../constants/Colors';
 import TextSize from '../constants/TextSize';
-import HomeBody from '../components/Home/HomeBody'
 
-export default class HomeScreen extends Component {
+export default class ProfileScreen extends Component {
   render() {
-    return (<HomeBody />
-    );
+    return <ProfileBody />;
   }
 }
 
-HomeScreen.navigationOptions = {
-  title: 'Home',
+ProfileScreen.navigationOptions = {
+  title: 'Profile',
   headerTitleStyle: {
     fontWeight: 'bold',
     fontSize: TextSize.TEXT_TITLE,
@@ -19,6 +19,6 @@ HomeScreen.navigationOptions = {
   },
 };
 
-HomeScreen.tabBarOptions = {
+ProfileScreen.tabBarOptions = {
   showLabel : false
 }
