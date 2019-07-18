@@ -6,7 +6,7 @@ import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout';
 import TextSize from '../../constants/TextSize';
-import events from '../../data/events';
+import { events } from '../../data/SampleData';
 
 export default class HomeBody extends Component {
   constructor(props) {
@@ -46,6 +46,7 @@ export default class HomeBody extends Component {
             title='New Meeting'
             buttonStyle={styles.button}
             titleStyle={{ fontSize: TextSize.TEXT_MEDIUM_SIZE }}
+            onPress={() => this.props.createNewMeeting()}
           />
         </View>
       </View>

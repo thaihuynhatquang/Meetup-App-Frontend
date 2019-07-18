@@ -1,4 +1,6 @@
 const tintColor = '#0359a1';
+// const tintColor = '#7E191B';
+
 
 export default {
   tintColor,
@@ -11,4 +13,5 @@ export default {
   warningText: '#666804',
   noticeBackground: tintColor,
   noticeText: '#fff',
+  placeHolderLightColor: '#ccc'
 };

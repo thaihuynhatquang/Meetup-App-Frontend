@@ -4,8 +4,9 @@ import { createStackNavigator, createBottomTabNavigator } from 'react-navigation
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import ListGroupScreen from '../screens/GroupScreen/ListGroupScreen';
+import CreateGroupScreen from '../screens/GroupScreen/CreateGroupScreen';
+import CreateGroupScreen2 from '../screens/GroupScreen/CreateGroupScreen2';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const config = Platform.select({
@@ -21,43 +22,52 @@ const HomeStack = createStackNavigator(
 );
 
 HomeStack.navigationOptions = {
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === 'ios' ? "ios-home" : 'md-home'}
-    />
-  ),
+  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-home' : 'md-home'} />,
 };
 
 HomeStack.path = '';
 
-const LinksStack = createStackNavigator(
+const MainGroupStack = createStackNavigator(
   {
-    Links: LinksScreen,
+    ListGroupScreen: {
+      screen: ListGroupScreen,
+      path: 'group/:list',
+    },
   },
-  config,
+  {
+    initialRouteName: 'ListGroupScreen',
+  },
 );
 
-LinksStack.navigationOptions = {
-  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-link' : 'md-link'} />,
-};
-
-LinksStack.path = '';
-
-const SettingsStack = createStackNavigator(
+const ModalGroupStack = createStackNavigator(
   {
-    Settings: SettingsScreen,
+    CreateGroupScreen: {
+      screen: CreateGroupScreen,
+      path: 'group/:create',
+    },
+    CreateGroupScreen2: {
+      screen: CreateGroupScreen2,
+      path: 'group/:create2',
+    },
   },
-  config,
 );
 
-SettingsStack.navigationOptions = {
+const RootGroupStack = createStackNavigator(
+  {
+    MainGroupStack: MainGroupStack,
+    ModalGroupStack: ModalGroupStack,
+  },
+  {
+    mode: 'modal',
+    headerMode: 'none',
+  },
+);
+
+RootGroupStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-options' : 'md-options'} />
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-people' : 'md-people'} />
   ),
 };
-
-SettingsStack.path = '';
 
 const ProfileStack = createStackNavigator(
   {
@@ -68,7 +78,7 @@ const ProfileStack = createStackNavigator(
 
 ProfileStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? `ios-person` : 'md-person'} />
+    <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? `ios-contact` : 'md-contact'} />
   ),
 };
 
@@ -76,12 +86,12 @@ ProfileStack.path = '';
 
 const tabNavigator = createBottomTabNavigator(
   {
+    RootGroupStack,
     HomeStack,
-    LinksStack,
-    SettingsStack,
     ProfileStack,
   },
   {
+    initialRouteName: 'HomeStack',
     tabBarOptions: {
       showLabel: false,
     },
