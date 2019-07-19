@@ -87,7 +87,7 @@ export default class CreateGroupBody extends Component {
             style={Platform.OS === 'ios' ? pickerSelectStyles.inputIOS : pickerSelectStyles.inputAndroid}
             onChangeText={(text) => this.setState({ text })}
             value={this.state.text}
-            placeholder='Write description about this...'
+            placeholder='Describe something about this...'
           />
           <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>Category</Text>
           <RNPickerSelect
