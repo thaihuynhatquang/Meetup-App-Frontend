@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import Colors from '../../constants/Colors';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import TextSize from '../../constants/TextSize';
 import CreateGroupBody2 from '../../components/Group/CreateGroupBody2';
 import { Icon } from 'react-native-elements';
+import { Text, Button } from 'native-base';
 
 export default class CreateGroupScreen2 extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -28,6 +29,13 @@ export default class CreateGroupScreen2 extends Component {
           }}
           onPress={() => navigation.goBack()}
         />
+      ),
+      headerRight: (
+        <View style={{ justifyContent: 'center', marginRight: 5 }}>
+          <Button small rounded style={{ backgroundColor: Colors.tintColor }}>
+            <Text>Done</Text>
+          </Button>
+        </View>
       ),
       tabBarOptions: {
         showLabel: false,

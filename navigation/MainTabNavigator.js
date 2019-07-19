@@ -50,6 +50,9 @@ const ModalGroupStack = createStackNavigator(
       path: 'group/:create2',
     },
   },
+  {
+    headerMode: 'float'
+  }
 );
 
 const RootGroupStack = createStackNavigator(
