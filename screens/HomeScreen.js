@@ -5,7 +5,11 @@ import HomeBody from '../components/Home/HomeBody';
 
 export default class HomeScreen extends Component {
   render() {
-    return <HomeBody createNewMeeting={() => this.props.navigation.navigate('CreateGroupScreen')} />;
+    return (
+      <HomeBody
+        createNewMeeting={() => this.props.navigation.navigate('CreateGroupScreen', { prevRoute: 'HomeScreen' })}
+      />
+    );
   }
 }
 

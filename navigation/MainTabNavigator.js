@@ -7,6 +7,7 @@ import HomeScreen from '../screens/HomeScreen';
 import ListGroupScreen from '../screens/GroupScreen/ListGroupScreen';
 import CreateGroupScreen from '../screens/GroupScreen/CreateGroupScreen';
 import CreateGroupScreen2 from '../screens/GroupScreen/CreateGroupScreen2';
+import DetailGroupScreen from '../screens/GroupScreen/DetailGroupScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const config = Platform.select({
@@ -16,7 +17,7 @@ const config = Platform.select({
 
 const HomeStack = createStackNavigator(
   {
-    Home: HomeScreen,
+    HomeScreen: HomeScreen,
   },
   config,
 );
@@ -49,24 +50,17 @@ const ModalGroupStack = createStackNavigator(
       screen: CreateGroupScreen2,
       path: 'group/:create2',
     },
+    DetailGroupScreen: {
+      screen: DetailGroupScreen,
+      path: 'group',
+    },
   },
   {
-    headerMode: 'float'
-  }
-);
-
-const RootGroupStack = createStackNavigator(
-  {
-    MainGroupStack: MainGroupStack,
-    ModalGroupStack: ModalGroupStack,
-  },
-  {
-    mode: 'modal',
-    headerMode: 'none',
+    headerMode: 'float',
   },
 );
 
-RootGroupStack.navigationOptions = {
+MainGroupStack.navigationOptions = {
   tabBarIcon: ({ focused }) => (
     <TabBarIcon focused={focused} name={Platform.OS === 'ios' ? 'ios-people' : 'md-people'} />
   ),
@@ -89,7 +83,7 @@ ProfileStack.path = '';
 
 const tabNavigator = createBottomTabNavigator(
   {
-    RootGroupStack,
+    MainGroupStack,
     HomeStack,
     ProfileStack,
   },
@@ -103,4 +97,15 @@ const tabNavigator = createBottomTabNavigator(
 
 tabNavigator.path = '';
 
-export default tabNavigator;
+const RootGroupStack = createStackNavigator(
+  {
+    tabNavigator: tabNavigator,
+    ModalGroupStack: ModalGroupStack,
+  },
+  {
+    mode: 'modal',
+    headerMode: 'none',
+  },
+);
+
+export default RootGroupStack;

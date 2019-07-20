@@ -7,6 +7,7 @@ import { Icon } from 'react-native-elements';
 
 export default class CreateGroupScreen extends Component {
   static navigationOptions = ({ navigation }) => {
+    const prevRoute = navigation.getParam('prevRoute', 'HomeScreen')
     return {
       title: 'New Meeting',
       headerStyle: {
@@ -26,7 +27,7 @@ export default class CreateGroupScreen extends Component {
           iconStyle={{
             marginLeft: 15,
           }}
-          onPress={() => navigation.navigate('ListGroupScreen')}
+          onPress={() => navigation.navigate(prevRoute)}
         />
       ),
       tabBarOptions: {

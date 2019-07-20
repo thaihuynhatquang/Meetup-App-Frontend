@@ -26,7 +26,8 @@ export default class GroupScreen extends Component {
           iconStyle={{
             marginRight: 15,
           }}
-          onPress={() => navigation.navigate('CreateGroupScreen')}
+          onPress={() => navigation.navigate('CreateGroupScreen', { prevRoute: 'ListGroupScreen' })}
+
         />
       ),
       tabBarOptions: {
