@@ -1,6 +1,11 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { createStackNavigator, createBottomTabNavigator } from 'react-navigation';
+import {
+  createStackNavigator,
+  createBottomTabNavigator,
+  createAppContainer,
+  createSwitchNavigator,
+} from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
@@ -9,6 +14,25 @@ import CreateGroupScreen from '../screens/GroupScreen/CreateGroupScreen';
 import CreateGroupScreen2 from '../screens/GroupScreen/CreateGroupScreen2';
 import DetailGroupScreen from '../screens/GroupScreen/DetailGroupScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import SignInScreen from '../screens/AuthenticationScreen/SignInScreen';
+import SignUpScreen from '../screens/AuthenticationScreen/SignUpScreen';
+import AuthLoadingScreen from '../screens/AuthLoadingScreen';
+
+const ModalGroupStack = createStackNavigator(
+  {
+    CreateGroupScreen: {
+      screen: CreateGroupScreen,
+      path: 'group/:create',
+    },
+    CreateGroupScreen2: {
+      screen: CreateGroupScreen2,
+      path: 'group/:create2',
+    },
+  },
+  {
+    headerMode: 'float',
+  },
+);
 
 const config = Platform.select({
   web: { headerMode: 'screen' },
@@ -34,29 +58,13 @@ const MainGroupStack = createStackNavigator(
       screen: ListGroupScreen,
       path: 'group/:list',
     },
-  },
-  {
-    initialRouteName: 'ListGroupScreen',
-  },
-);
-
-const ModalGroupStack = createStackNavigator(
-  {
-    CreateGroupScreen: {
-      screen: CreateGroupScreen,
-      path: 'group/:create',
-    },
-    CreateGroupScreen2: {
-      screen: CreateGroupScreen2,
-      path: 'group/:create2',
-    },
     DetailGroupScreen: {
       screen: DetailGroupScreen,
       path: 'group',
     },
   },
   {
-    headerMode: 'float',
+    initialRouteName: 'ListGroupScreen',
   },
 );
 
@@ -97,7 +105,7 @@ const tabNavigator = createBottomTabNavigator(
 
 tabNavigator.path = '';
 
-const RootGroupStack = createStackNavigator(
+const AppStack = createStackNavigator(
   {
     tabNavigator: tabNavigator,
     ModalGroupStack: ModalGroupStack,
@@ -108,4 +116,20 @@ const RootGroupStack = createStackNavigator(
   },
 );
 
-export default RootGroupStack;
+const AuthStack = createStackNavigator({
+  SignIn: SignInScreen,
+  SignUp: SignUpScreen,
+});
+
+export default createAppContainer(
+  createSwitchNavigator(
+    {
+      AuthLoading: AuthLoadingScreen,
+      App: AppStack,
+      Auth: AuthStack,
+    },
+    {
+      initialRouteName: 'AuthLoading',
+    },
+  ),
+);

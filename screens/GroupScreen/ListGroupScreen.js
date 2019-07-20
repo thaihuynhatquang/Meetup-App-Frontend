@@ -36,6 +36,6 @@ export default class GroupScreen extends Component {
     };
   };
   render() {
-    return <ListGroupBody />;
+    return <ListGroupBody viewGroupDetail={() => this.props.navigation.navigate('DetailGroupScreen')}/>;
   }
 }

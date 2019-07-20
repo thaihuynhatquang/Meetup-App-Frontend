@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, FlatList } from 'react-native';
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
 import Colors from '../../constants/Colors';
 import { groups } from '../../data/SampleData';
 
@@ -43,7 +43,7 @@ export default class ListGroupBody extends Component {
             mainContentStyle = styles.mainContent;
           }
           return (
-            <View style={styles.container}>
+            <TouchableOpacity onPress={() => this.props.viewGroupDetail()} style={styles.container}>
               <Image source={{ uri: Group.image }} style={styles.avatar} />
               <View style={styles.content}>
                 <View style={mainContentStyle}>
@@ -55,7 +55,7 @@ export default class ListGroupBody extends Component {
                   {this.renderGroupMembers(Group)}
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
       />

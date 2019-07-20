@@ -1,7 +1,6 @@
 const tintColor = '#0359a1';
 // const tintColor = '#7E191B';
 
-
 export default {
   tintColor,
   tabIconDefault: '#ccc',
@@ -13,5 +12,8 @@ export default {
   warningText: '#666804',
   noticeBackground: tintColor,
   noticeText: '#fff',
-  placeHolderLightColor: '#ccc'
+  placeHolderLightColor: '#ccc',
+  dodger_blue: '#428AF8',
+  silver: '#BEBEBE',
+  torch_red: '#F8262F'
 };

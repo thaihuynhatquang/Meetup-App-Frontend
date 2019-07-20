@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
+import { Button } from 'react-native-elements';
 import Colors from '../../constants/Colors';
+import TextSize from '../../constants/TextSize';
+import Layout from '../../constants/Layout';
 
 export default class ProfileView extends Component {
   render() {
@@ -21,6 +24,15 @@ export default class ProfileView extends Component {
             <Text style={styles.textInfoBold}>Address:</Text>
             <Text style={styles.textInfo}>157 Pháo Đài Láng, Phường Láng Thượng, Quận Đống Đa, Hà Nội</Text>
           </View>
+        </View>
+
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Button
+            title='Sign out'
+            buttonStyle={styles.button}
+            titleStyle={{ fontSize: TextSize.TEXT_MEDIUM_SIZE }}
+            onPress={() => this.props.signOut()}
+          />
         </View>
       </View>
     );
@@ -62,10 +74,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 20,
     color: 'black',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   textInfo: {
     fontSize: 18,
     color: 'black',
+  },
+  button: {
+    backgroundColor: Colors.tintColor,
+    borderRadius: 4,
+    height: Layout.window.height * 0.07,
+    width: Layout.window.width * 0.8,
+    shadowColor: Colors.tintColor,
+    shadowOffset: {
+      width: 0,
+      height: 9,
+    },
+    shadowOpacity: 0.35,
+    shadowRadius: 9,
+    elevation: 14,
   },
 });
