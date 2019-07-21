@@ -18,6 +18,18 @@ import SignInScreen from '../screens/AuthenticationScreen/SignInScreen';
 import SignUpScreen from '../screens/AuthenticationScreen/SignUpScreen';
 import AuthLoadingScreen from '../screens/AuthLoadingScreen';
 
+const GroupChatStack = createStackNavigator(
+  {
+    DetailGroupScreen: {
+      screen: DetailGroupScreen,
+      path: 'group/:detail',
+    },
+  },
+  {
+    headerMode: 'float',
+  },
+);
+
 const ModalGroupStack = createStackNavigator(
   {
     CreateGroupScreen: {
@@ -57,10 +69,6 @@ const MainGroupStack = createStackNavigator(
     ListGroupScreen: {
       screen: ListGroupScreen,
       path: 'group/:list',
-    },
-    DetailGroupScreen: {
-      screen: DetailGroupScreen,
-      path: 'group',
     },
   },
   {
@@ -105,9 +113,19 @@ const tabNavigator = createBottomTabNavigator(
 
 tabNavigator.path = '';
 
-const AppStack = createStackNavigator(
+const overideTabNavigator = createStackNavigator(
   {
     tabNavigator: tabNavigator,
+    GroupChatStack: GroupChatStack,
+  },
+  {
+    headerMode: 'none',
+  },
+);
+
+const AppStack = createStackNavigator(
+  {
+    overideTabNavigator: overideTabNavigator,
     ModalGroupStack: ModalGroupStack,
   },
   {
@@ -116,7 +134,7 @@ const AppStack = createStackNavigator(
   },
 );
 
-const AuthStack = createStackNavigator({
+const AuthStack = createSwitchNavigator({
   SignIn: SignInScreen,
   SignUp: SignUpScreen,
 });

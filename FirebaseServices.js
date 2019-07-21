@@ -20,6 +20,12 @@ class FirebaseSvc {
       .signInWithEmailAndPassword(user.email, user.password)
       .then(success_callback, failed_callback);
   };
+  createAccount = async (user, success_callback, failed_callback) => {
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(user.email, user.password)
+      .then(success_callback, failed_callback);
+  };
 }
 const firebaseSvc = new FirebaseSvc();
 export default firebaseSvc;

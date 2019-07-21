@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import Colors from '../../constants/Colors';
-import { Platform, View } from 'react-native';
-import TextSize from '../../constants/TextSize';
-import CreateGroupBody2 from '../../components/Group/CreateGroupBody2';
+import { StyleSheet, Platform, FlatList, View } from 'react-native';
 import { Icon } from 'react-native-elements';
-import { Text, Button } from 'native-base';
+import { Text, Button, Container, Body, ListItem, Content, Thumbnail, Left, Header, Item, Input } from 'native-base';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { users } from '../../data/SampleData';
+import Colors from '../../constants/Colors';
+import TextSize from '../../constants/TextSize';
 
 export default class CreateGroupScreen2 extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -32,7 +33,11 @@ export default class CreateGroupScreen2 extends Component {
       ),
       headerRight: (
         <View style={{ justifyContent: 'center', marginRight: 5 }}>
-          <Button onPress={() => navigation.navigate('DetailGroupScreen')} small rounded style={{ backgroundColor: Colors.tintColor }}>
+          <Button
+            onPress={() => navigation.navigate('DetailGroupScreen')}
+            small
+            rounded
+            style={{ backgroundColor: Colors.tintColor }}>
             <Text>Done</Text>
           </Button>
         </View>
@@ -43,7 +48,85 @@ export default class CreateGroupScreen2 extends Component {
     };
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: users,
+      inputSearch: null,
+      selectedData: [],
+    };
+  }
+
+  _filterListContacts = (users, filterValue) => {
+    return users.filter((user) => user.name.includes(filterValue));
+  };
+
+  _handleSearchEvent = (event) => {
+    value = event.nativeEvent.text;
+    this.setState({ inputSearch: value });
+    if (value && value !== '') {
+      this.setState({ data: this._filterListContacts(users, value) });
+    } else {
+      this.setState({ data: users });
+    }
+  };
+
+  _renderItem = ({ item }) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          item.checked = !item.checked;
+          this.setState({ data: users });
+          console.log(item.checked);
+        }}>
+        <ListItem thumbnail selected noIndent>
+          <Left>
+            <Thumbnail small source={{ uri: item.image }} />
+          </Left>
+          <Body>
+            <Text style={{ fontWeight: 'bold', color: Colors.tintColor }}>{item.name}</Text>
+          </Body>
+          {item.checked ? (
+            <Icon
+              name={Platform.OS === 'ios' ? 'ios-checkmark-circle' : 'md-checkmark-circle'}
+              iconStyle={{ color: Colors.tintColor, fontSize: 24 }}
+              type='ionicon'
+              color={Colors.tintColor}
+            />
+          ) : (
+            <Icon
+              name={Platform.OS === 'ios' ? 'ios-radio-button-off' : 'md-radio-button-off'}
+              iconStyle={{ color: Colors.tintColor, fontSize: 24 }}
+              type='ionicon'
+              color={Colors.tintColor}
+            />
+          )}
+        </ListItem>
+      </TouchableOpacity>
+    );
+  };
+
   render() {
-    return <CreateGroupBody2 />;
+    return (
+      <Container>
+        <Header searchBar rounded style={{ paddingBottom: 10 }}>
+          <Item style={{ alignSelf: 'center', paddingLeft: 10, paddingRight: 10 }}>
+            <Icon name={Platform.OS === 'ios' ? 'ios-search' : 'md-search'} type='ionicon' color={Colors.tintColor} />
+            <Input placeholder='Search' value={this.state.inputSearch} onChange={this._handleSearchEvent} />
+            <Icon name={Platform.OS === 'ios' ? 'ios-people' : 'md-people'} type='ionicon' color={Colors.tintColor} />
+          </Item>
+        </Header>
+        <Content>
+          <FlatList
+            style={{ padding: 5 }}
+            data={this.state.data}
+            renderItem={(item) => this._renderItem(item)}
+            keyExtractor={(item) => item.id.toString()}
+          />
+        </Content>
+      </Container>
+    );
   }
 }
+
+const styles = StyleSheet.create({});

@@ -1,8 +1,22 @@
 import React from 'react';
-import { AsyncStorage, View, Button, TextInput, Text, StyleSheet, Image, KeyboardAvoidingView } from 'react-native';
+import {
+  AsyncStorage,
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+} from 'react-native';
+import firebase from 'firebase';
+import { Button } from 'react-native-elements';
 import firebaseSvc from '../../FirebaseServices';
 import Colors from '../../constants/Colors';
 import imageLogo from '../../assets/images/robot-dev.png';
+import { Platform } from '@unimodules/core';
+import TextSize from '../../constants/TextSize';
+import Layout from '../../constants/Layout';
 
 export default class SignInScreen extends React.Component {
   passwordInputRef = React.createRef();
@@ -47,15 +61,17 @@ export default class SignInScreen extends React.Component {
     };
     firebaseSvc.login(user, this.loginSuccess, this.loginFailed);
   };
-  loginSuccess = () => {
-    console.log('login successful, navigate to chat.');
-    this.props.navigation.navigate('Chat', {
-      name: this.state.name,
-      email: this.state.email,
-    });
+  loginSuccess = async (userData) => {
+    await AsyncStorage.setItem('userData', JSON.stringify(userData));
+    this.props.navigation.navigate('App');
   };
   loginFailed = () => {
     alert('Login failure. Please tried again.');
+  };
+
+  _signInAsync = async () => {
+    await AsyncStorage.setItem('userToken', 'abc');
+    this.props.navigation.navigate('App');
   };
 
   render() {
@@ -65,7 +81,7 @@ export default class SignInScreen extends React.Component {
     const emailError = !email && emailTouched ? 'Email is required' : undefined;
     const passwordError = !password && passwordTouched ? 'Password is required' : undefined;
     return (
-      <KeyboardAvoidingView style={styles.container} behavior='padding'>
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <Image source={imageLogo} style={styles.logo} />
         <View style={styles.form}>
           <TextInput
@@ -79,6 +95,7 @@ export default class SignInScreen extends React.Component {
             keyboardType='email-address'
             returnKeyType='next'
             onBlur={this.handleEmailBlur}
+            blurOnSubmit={Platform.OS === 'ios'}
           />
           <Text style={styles.errorText}>{emailError || ''}</Text>
           <TextInput
@@ -93,21 +110,25 @@ export default class SignInScreen extends React.Component {
             onBlur={this.handlePasswordBlur}
           />
           <Text style={styles.errorText}>{passwordError || ''}</Text>
-          <Button title='Sign in' onPress={this._signInAsync} />
         </View>
+        <Button
+          title='Sign in'
+          buttonStyle={styles.button}
+          titleStyle={{ fontSize: TextSize.TEXT_MEDIUM_SIZE }}
+          onPress={this.onPressLogin}
+        />
+        <TouchableOpacity style={{ marginVertical: 30 }} onPress={() => this.props.navigation.navigate('SignUp')}>
+          <Text style={{ color: Colors.tintColor }}>New to Meetup? Register Here</Text>
+        </TouchableOpacity>
       </KeyboardAvoidingView>
     );
   }
-
-  _signInAsync = async () => {
-    await AsyncStorage.setItem('userToken', 'abc');
-    this.props.navigation.navigate('App');
-  };
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 15,
     backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -124,13 +145,29 @@ const styles = StyleSheet.create({
     width: '80%',
   },
   textInput: {
-    height: 40,
+    height: 30,
     borderColor: Colors.silver,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    marginBottom: 20,
+    marginBottom: 5,
   },
   errorText: {
-    height: 20,
+    height: 15,
     color: Colors.torch_red,
+    fontSize: 12,
+  },
+  button: {
+    backgroundColor: Colors.tintColor,
+    borderRadius: 4,
+    height: Layout.window.height * 0.07,
+    width: Layout.window.width * 0.8,
+    shadowColor: Colors.tintColor,
+    shadowOffset: {
+      width: 0,
+      height: 9,
+    },
+    shadowOpacity: 0.35,
+    shadowRadius: 9,
+    elevation: 14,
+    marginTop: 20,
   },
 });
