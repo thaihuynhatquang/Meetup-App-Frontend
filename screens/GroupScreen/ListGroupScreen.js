@@ -56,7 +56,6 @@ export default class GroupScreen extends Component {
   };
 
   render() {
-    // return <ListGroupBody viewGroupDetail={() => this.props.navigation.navigate('DetailGroupScreen')}/>;
     return (
       <FlatList
         style={styles.root}
@@ -75,7 +74,7 @@ export default class GroupScreen extends Component {
             mainContentStyle = styles.mainContent;
           }
           return (
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('DetailGroupScreen')} style={styles.container}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('GroupChatScreen')} style={styles.container}>
               <Image source={{ uri: Group.image }} style={styles.avatar} />
               <View style={styles.content}>
                 <View style={mainContentStyle}>

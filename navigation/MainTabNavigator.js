@@ -12,23 +12,23 @@ import HomeScreen from '../screens/HomeScreen';
 import ListGroupScreen from '../screens/GroupScreen/ListGroupScreen';
 import CreateGroupScreen from '../screens/GroupScreen/CreateGroupScreen';
 import CreateGroupScreen2 from '../screens/GroupScreen/CreateGroupScreen2';
-import DetailGroupScreen from '../screens/GroupScreen/DetailGroupScreen';
+import GroupChatScreen from '../screens/GroupScreen/GroupChatScreen';
+import GroupDetailScreen from '../screens/GroupScreen/GroupDetailScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SignInScreen from '../screens/AuthenticationScreen/SignInScreen';
 import SignUpScreen from '../screens/AuthenticationScreen/SignUpScreen';
 import AuthLoadingScreen from '../screens/AuthLoadingScreen';
 
-const GroupChatStack = createStackNavigator(
-  {
-    DetailGroupScreen: {
-      screen: DetailGroupScreen,
-      path: 'group/:detail',
-    },
+const GroupChatStack = createStackNavigator({
+  GroupChatScreen: {
+    screen: GroupChatScreen,
+    path: 'group/:chat',
   },
-  {
-    headerMode: 'float',
+  GroupDetailScreen: {
+    screen: GroupDetailScreen,
+    path: 'group/:detailD',
   },
-);
+});
 
 const ModalGroupStack = createStackNavigator(
   {

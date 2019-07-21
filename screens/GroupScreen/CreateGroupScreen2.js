@@ -34,7 +34,7 @@ export default class CreateGroupScreen2 extends Component {
       headerRight: (
         <View style={{ justifyContent: 'center', marginRight: 5 }}>
           <Button
-            onPress={() => navigation.navigate('DetailGroupScreen')}
+            onPress={() => navigation.navigate('GroupChatScreen')}
             small
             rounded
             style={{ backgroundColor: Colors.tintColor }}>
