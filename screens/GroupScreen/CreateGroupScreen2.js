@@ -77,7 +77,6 @@ export default class CreateGroupScreen2 extends Component {
         onPress={() => {
           item.checked = !item.checked;
           this.setState({ data: users });
-          console.log(item.checked);
         }}>
         <ListItem thumbnail selected noIndent>
           <Left>

@@ -1,5 +1,16 @@
 import React, { Component } from 'react';
-import { StyleSheet, Platform, View, Image, Text, TextInput, Alert, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  Platform,
+  ScrollView,
+  View,
+  Image,
+  Text,
+  KeyboardAvoidingView,
+  TextInput,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
 import { Icon, Input, Button } from 'react-native-elements';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
@@ -47,7 +58,11 @@ export default class GroupDetailScreen extends Component {
       headerRight: (
         <View style={{ justifyContent: 'center', marginRight: 5 }}>
           <NativeBaseComponent.Button
-            onPress={() => navigation.getParam('handleMode', {})()}
+            onPress={() => {
+              if (navigation.getParam('handleMode', null)) {
+                return navigation.getParam('handleMode')();
+              }
+            }}
             small
             rounded
             style={{ backgroundColor: Colors.tintColor }}>
@@ -99,7 +114,7 @@ export default class GroupDetailScreen extends Component {
       color: '#9EA0A4',
     };
     return (
-      <View style={styles.container}>
+      <NativeBaseComponent.Content style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.header}>
           <View style={styles.headerContent}>
             <TouchableOpacity
@@ -110,12 +125,14 @@ export default class GroupDetailScreen extends Component {
               }
               disabled={!editMode}>
               {image ? (
-                <Image
+                <NativeBaseComponent.Thumbnail
+                  large
                   style={[styles.avatar, { borderColor: editMode ? 'white' : Colors.disableInputBackground }]}
                   source={{ uri: image }}
                 />
               ) : (
-                <Image
+                <NativeBaseComponent.Thumbnail
+                  large
                   style={[styles.avatar, { borderColor: editMode ? 'white' : Colors.disableInputBackground }]}
                   source={{ uri: 'https://uphinh.org/images/2019/07/18/Untitled-16446da271a5f9b7c.png' }}
                 />
@@ -128,7 +145,7 @@ export default class GroupDetailScreen extends Component {
             />
           </View>
         </View>
-        <View style={{ flex: 2, justifyContent: 'flex-start', paddingHorizontal: 30 }}>
+        <View style={{ flex: 3, justifyContent: 'flex-start', paddingHorizontal: 30 }}>
           <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>Description</Text>
           <TextInput
             style={[styles.textInput, { backgroundColor: editMode ? 'white' : Colors.disableInputBackground }]}
@@ -155,16 +172,26 @@ export default class GroupDetailScreen extends Component {
             placeholderTextColor={Colors.placeHolderLightColor}
             disabled={!editMode}
           />
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Button
-              title='Continue'
-              buttonStyle={styles.button}
-              titleStyle={{ fontSize: TextSize.TEXT_MEDIUM_SIZE }}
-              onPress={() => this.props.navigation.navigate('CreateGroupScreen2')}
-            />
-          </View>
+          <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>Description</Text>
+          <TextInput
+            style={[styles.textInput, { backgroundColor: editMode ? 'white' : Colors.disableInputBackground }]}
+            onChangeText={(text) => this.setState({ text })}
+            value={this.state.description}
+            placeholder='Describe something about this...'
+            placeholderTextColor={Colors.placeHolderLightColor}
+            editable={editMode}
+          />
+          <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>Description</Text>
+          <TextInput
+            style={[styles.textInput, { backgroundColor: editMode ? 'white' : Colors.disableInputBackground }]}
+            onChangeText={(text) => this.setState({ text })}
+            value={this.state.description}
+            placeholder='Describe something about this...'
+            placeholderTextColor={Colors.placeHolderLightColor}
+            editable={editMode}
+          />
         </View>
-      </View>
+      </NativeBaseComponent.Content>
     );
   }
 }
@@ -174,6 +201,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flex: 1,
     backgroundColor: Colors.tintColor,
   },
   headerContent: {
@@ -181,11 +209,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    width: 130,
-    height: 130,
-    borderRadius: 63,
+    // flex: 1,
+    // width: 80,
+    // height: 80,
+    // borderRadius: 40,
     borderWidth: 4,
-    marginBottom: 10,
+    // marginBottom: 10,
+    resizeMode: 'contain',
+    alignSelf: 'center',
   },
   name: {
     fontSize: 22,
@@ -196,20 +227,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     margin: 30,
-  },
-  button: {
-    backgroundColor: Colors.tintColor,
-    borderRadius: 4,
-    height: Layout.window.height * 0.07,
-    width: '100%',
-    shadowColor: Colors.tintColor,
-    shadowOffset: {
-      width: 0,
-      height: 9,
-    },
-    shadowOpacity: 0.35,
-    shadowRadius: 9,
-    elevation: 14,
   },
   textDecription: {
     fontSize: 16,
