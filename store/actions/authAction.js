@@ -10,8 +10,8 @@ export const loginUser = (userInfo) => {
       .post(`${API_URL}/user/loginWithGoogle`, userInfo)
       .then((res) => {
         let data = res.data;
-        axios.defaults.headers.common['Authorization'] = data.token;
-        dispatch(loginUserSuccess(data));
+        axios.defaults.headers.common['authorization'] = data.token;
+        dispatch(loginUserSuccess(data.userInformation));
       })
       .catch((err) => {
         Alert.alert('Timeout of 0ms Exceeded. Server Error');

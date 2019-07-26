@@ -6,8 +6,12 @@ import { Alert } from 'react-native';
 export const createGroup = (groupInformation) => {
   return (dispatch, getState) => {
     dispatch(createGroupStarted());
-    axios
-      .post(`${API_URL}/group/createGroup`, groupInformation)
+    axios({
+      method: 'post',
+      url: `${API_URL}/group/createGroup`,
+      data: groupInformation,
+      config: { headers: { 'Content-Type': 'multipart/form-data' } },
+    })
       .then((res) => {
         let data = res.data;
         console.log(data);

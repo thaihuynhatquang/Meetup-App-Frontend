@@ -55,24 +55,44 @@ class CreateGroupScreen2 extends Component {
   };
 
   async componentDidMount() {
-    console.log(this.props);
     await this.props.navigation.setParams({
       createNewGroup: () => this.createNewGroup(),
     });
+    console.log(this.props.listUser);
   }
 
   createNewGroup = async () => {
     let groupInformation = this.props.navigation.getParam('groupInformation');
     groupInformation.member = [];
-    console.log(groupInformation);
+    groupInformation.adminEmail = this.props.userInfo.userName || 'thaihuynhatquang@gmail.com';
+    const bodyFormData = new FormData();
+
+    const uri = groupInformation.groupAvatar;
+    if (uri != null) {
+      const uriParts = uri.split('.');
+      const fileType = uriParts[uriParts.length - 1];
+      bodyFormData.append('groupAvatar', {
+        uri,
+        name: `groupAvatar.${fileType}`,
+        type: `image/${fileType}`,
+      });
+    }
+
+    bodyFormData.append('adminEmail', groupInformation.adminEmail);
+    bodyFormData.append('category', groupInformation.category);
+    bodyFormData.append('description', groupInformation.description);
+    bodyFormData.append('groupName', groupInformation.groupName);
+    bodyFormData.append('member', groupInformation.member);
+
+    console.log(bodyFormData);
     await this.props.onCreateGroup(groupInformation);
-    navigation.navigate('GroupChatScreen');
+    this.props.navigation.navigate('GroupChatScreen');
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      data: users,
+      data: this.props.listUser,
       inputSearch: null,
       selectedData: [],
     };
@@ -101,7 +121,7 @@ class CreateGroupScreen2 extends Component {
         }}>
         <ListItem thumbnail selected noIndent>
           <Left>
-            <Thumbnail small source={{ uri: item.image }} />
+            <Thumbnail small source={{ uri: item.avatar }} />
           </Left>
           <Body>
             <Text style={{ fontWeight: 'bold', color: Colors.tintColor }}>{item.name}</Text>
@@ -141,7 +161,7 @@ class CreateGroupScreen2 extends Component {
             style={{ padding: 5 }}
             data={this.state.data}
             renderItem={(item) => this._renderItem(item)}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.name.toString()}
           />
         </Content>
       </Container>
@@ -151,6 +171,7 @@ class CreateGroupScreen2 extends Component {
 
 const mapStateToProps = (state) => ({
   userInfo: state.authReducer.userInfo,
+  listUser: state.listUserReducer.listUser,
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -4,6 +4,7 @@ import { Button, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { onSignIn, signInWithGoogleAsync } from '../utils/auth';
 import { loginUser } from '../store/actions/authAction';
+import { listUser } from '../store/actions/listUserAction';
 import Colors from '../constants/Colors';
 import Layout from '../constants/Layout';
 import TextSize from '../constants/TextSize';
@@ -20,16 +21,14 @@ class AuthScreen extends React.Component {
 
   _onLogin = async (item) => {
     await this.props.onLogin({ token: item.idToken, platform: item.platform });
-
-    if (this.props.loginError !== null) {
-      Alert.alert('Authenticate Error');
-    } else {
-    }
   };
 
   shouldComponentUpdate(nextProps) {
     if (nextProps.userInfo !== this.props.userInfo) {
-      onSignIn(nextProps.userInfo).then(() => nextProps.navigation.navigate('AuthLoading'));
+      onSignIn(nextProps.userInfo).then(() => {
+        this.props.getListUser();
+        nextProps.navigation.navigate('App');
+      });
       return true;
     }
     return false;
@@ -62,6 +61,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   onLogin: (userInfo) => dispatch(loginUser(userInfo)),
+  getListUser: () => dispatch(listUser()),
 });
 
 export default connect(

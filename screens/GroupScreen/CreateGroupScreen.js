@@ -146,15 +146,9 @@ export default class CreateGroupScreen extends Component {
           <View style={{ alignItems: 'center' }}>
             <Button
               title='Continue'
-              // disabled={disabledButton}
-              buttonStyle={[
-                styles.button,
-                {
-                  backgroundColor: disabledButton ? undefined : Colors.tintColor,
-                  shadowColor: disabledButton ? undefined : Colors.tintColor,
-                },
-              ]}
-              titleStyle={{ fontSize: TextSize.TEXT_MEDIUM_SIZE }}
+              disabled={disabledButton}
+              buttonStyle={styles.button}
+              titleStyle={{ fontSize: TextSize.TEXT_MEDIUM_SIZE, color: disabledButton ? 'black' : 'white' }}
               onPress={() => {
                 let groupInformation = {
                   groupAvatar: this.state.groupAvatar,
@@ -215,6 +209,8 @@ const styles = StyleSheet.create({
     elevation: 14,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: Colors.tintColor,
+    shadowColor: Colors.tintColor,
   },
 });
 

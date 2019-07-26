@@ -13,7 +13,7 @@ const initialState = {
   error: null,
 };
 
-export default (authReducer = (state = initialState, action) => {
+export default (groupReducer = (state = initialState, action) => {
   switch (action.type) {
     case CREATE_GROUP:
       return {

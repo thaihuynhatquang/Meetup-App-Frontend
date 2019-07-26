@@ -5,6 +5,7 @@ import axios from 'axios';
 
 export const onSignIn = async (userInfo) => {
   try {
+    await AsyncStorage.clear();
     await AsyncStorage.setItem('userData', JSON.stringify(userInfo));
   } catch (error) {
     console.log('Something went wrong', error);
@@ -22,7 +23,7 @@ export const isSignedIn = async () => {
     let userData = await AsyncStorage.getItem('userData');
     if (!userData) return false;
     let data = JSON.parse(userData);
-    axios.defaults.headers.common['Authorization'] = data.token;
+    axios.defaults.headers.common['authorization'] = data.token;
     await axios
       .post(`${API_URL}/user/auth`, { token: data.token })
       .then((res) => {
@@ -32,7 +33,6 @@ export const isSignedIn = async () => {
       })
       .catch((error) => {
         Alert.alert(error);
-
         return false;
       });
     return true;
