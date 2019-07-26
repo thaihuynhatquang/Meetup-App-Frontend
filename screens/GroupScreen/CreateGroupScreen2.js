@@ -6,8 +6,10 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { users } from '../../data/SampleData';
 import Colors from '../../constants/Colors';
 import TextSize from '../../constants/TextSize';
+import { connect } from 'react-redux';
+import { createGroup } from '../../store/actions/groupAction';
 
-export default class CreateGroupScreen2 extends Component {
+class CreateGroupScreen2 extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: 'New Meeting',
@@ -34,7 +36,11 @@ export default class CreateGroupScreen2 extends Component {
       headerRight: (
         <View style={{ justifyContent: 'center', marginRight: 5 }}>
           <Button
-            onPress={() => navigation.navigate('GroupChatScreen')}
+            onPress={() => {
+              if (navigation.getParam('createNewGroup', null)) {
+                return navigation.getParam('createNewGroup')();
+              }
+            }}
             small
             rounded
             style={{ backgroundColor: Colors.tintColor }}>
@@ -46,6 +52,21 @@ export default class CreateGroupScreen2 extends Component {
         showLabel: false,
       },
     };
+  };
+
+  async componentDidMount() {
+    console.log(this.props);
+    await this.props.navigation.setParams({
+      createNewGroup: () => this.createNewGroup(),
+    });
+  }
+
+  createNewGroup = async () => {
+    let groupInformation = this.props.navigation.getParam('groupInformation');
+    groupInformation.member = [];
+    console.log(groupInformation);
+    await this.props.onCreateGroup(groupInformation);
+    navigation.navigate('GroupChatScreen');
   };
 
   constructor(props) {
@@ -127,5 +148,18 @@ export default class CreateGroupScreen2 extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  userInfo: state.authReducer.userInfo,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  onCreateGroup: (groupInformation) => dispatch(createGroup(groupInformation)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(CreateGroupScreen2);
 
 const styles = StyleSheet.create({});

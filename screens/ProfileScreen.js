@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
-import { AsyncStorage, StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
 import { Button } from 'react-native-elements';
 import Colors from '../constants/Colors';
 import TextSize from '../constants/TextSize';
 import Layout from '../constants/Layout';
 
-export default class ProfileScreen extends Component {
+import { connect } from 'react-redux';
+import { logoutUser } from '../store/actions/authAction';
+import { onSignOut } from '../utils/auth';
+
+class ProfileScreen extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: 'Profile',
@@ -20,8 +24,8 @@ export default class ProfileScreen extends Component {
     };
   };
   _signOutAsync = async () => {
-    await AsyncStorage.clear();
-    this.props.navigation.navigate('Auth');
+    this.props.onLogout();
+    onSignOut().then(() => this.props.navigation.navigate('AuthLoading'));
   };
   render() {
     return (
@@ -55,6 +59,15 @@ export default class ProfileScreen extends Component {
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+  onLogout: () => dispatch(logoutUser()),
+});
+
+export default connect(
+  null,
+  mapDispatchToProps,
+)(ProfileScreen);
 
 const styles = StyleSheet.create({
   container: {

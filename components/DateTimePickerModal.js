@@ -1,13 +1,11 @@
 import React, { Component } from 'react';
 import { Container, Left, Right, Body, Button, Header, Icon, Content, Input, Text, Item } from 'native-base';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, Platform } from 'react-native';
 import Colors from '../constants/Colors';
 import Layout from '../constants/Layout';
 import TextSize from '../constants/TextSize';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import DatePicker from 'react-native-datepicker';
-import PureChart from 'react-native-pure-chart';
-import { timeListData } from '../data/SampleData';
 
 export default class DateTimePickerModal extends Component {
   constructor(props) {
@@ -78,11 +76,22 @@ export default class DateTimePickerModal extends Component {
       />
     );
     return (
-      <Container style={{ flex: 1 }}>
-        <Header>
+      <Container style={{ flex: 1, padding: 0, backgroundColor: 'white' }}>
+        <Header
+          style={{
+            height: 50,
+            alignItems: 'center',
+            backgroundColor: 'white',
+            width: '100%',
+            justifyContent: 'center',
+            paddingBottom: 5,
+          }}>
           <Left>
             <Button transparent onPress={() => this.props.closeModal()}>
-              <Icon name='arrow-back' />
+              <Icon
+                name={Platform.OS === 'ios' ? 'ios-arrow-back' : 'md-arrow-back'}
+                style={{ fontSize: 28, color: Colors.tintColor }}
+              />
             </Button>
           </Left>
           <Body>

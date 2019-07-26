@@ -56,15 +56,34 @@ export default class DateTimePickerModal extends Component {
 
   render() {
     return (
-      <Container style={{ flex: 1 }}>
-        <Header>
+      <Container style={{ flex: 1, padding: 0, backgroundColor: 'white' }}>
+        <Header
+          style={{
+            height: 50,
+            alignItems: 'center',
+            backgroundColor: 'white',
+            width: '100%',
+            justifyContent: 'center',
+            paddingBottom: 5,
+          }}>
           <Left>
             <Button transparent onPress={() => this.props.closeModal()}>
-              <Icon name='arrow-back' />
+              <Icon
+                name={Platform.OS === 'ios' ? 'ios-arrow-back' : 'md-arrow-back'}
+                style={{ fontSize: 28, color: Colors.tintColor }}
+              />
             </Button>
           </Left>
           <Body>
-            <Text style={{ fontWeight: 'bold', fontSize: TextSize.TEXT_TITLE, color: Colors.tintColor }}>Location</Text>
+            <Text
+              style={{
+                textAlign: 'center',
+                fontWeight: 'bold',
+                fontSize: TextSize.TEXT_TITLE,
+                color: Colors.tintColor,
+              }}>
+              Location
+            </Text>
           </Body>
           <Right />
         </Header>

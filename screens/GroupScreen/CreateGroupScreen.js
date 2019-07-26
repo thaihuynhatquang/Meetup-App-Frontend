@@ -46,11 +46,14 @@ export default class CreateGroupScreen extends Component {
     super(props);
 
     this.inputRefs = {
-      textInputValue: '',
+      category: '',
     };
 
     this.state = {
-      image: null,
+      groupAvatar: null,
+      description: null,
+      groupName: null,
+      category: 'Eating',
       hasExplorePermission: null,
       type: Camera.Constants.Type.back,
     };
@@ -66,26 +69,28 @@ export default class CreateGroupScreen extends Component {
   };
 
   _pickImageFromExplorer = async () => {
+    console.log('PickImageS');
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [1, 1],
     });
 
     if (!result.cancelled) {
-      this.setState({ image: result.uri });
+      console.log('result: ', result);
+      this.setState({ groupAvatar: result.uri });
       return Promise.resolve(result);
     }
-
+    console.log('Reject');
     return Promise.reject();
   };
 
   render() {
-    const { image } = this.state;
-    const placeholder = {
-      label: 'Select category place...',
-      value: null,
-      color: '#9EA0A4',
-    };
+    const { groupAvatar } = this.state;
+    const disabledButton =
+      this.state.groupAvatar === null ||
+      this.state.description === null ||
+      this.state.groupName === null ||
+      this.state.category === null;
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -96,8 +101,8 @@ export default class CreateGroupScreen extends Component {
                   .then((r) => console.log(r))
                   .catch((e) => console.log(e))
               }>
-              {image ? (
-                <Image style={styles.avatar} source={{ uri: image }} />
+              {groupAvatar ? (
+                <Image style={styles.avatar} source={{ uri: groupAvatar }} />
               ) : (
                 <Image
                   style={styles.avatar}
@@ -106,6 +111,10 @@ export default class CreateGroupScreen extends Component {
               )}
             </TouchableOpacity>
             <Input
+              value={this.state.groupName}
+              onChangeText={(groupName) => {
+                this.setState({ groupName: groupName });
+              }}
               inputStyle={styles.name}
               placeholder='Group name'
               placeholderTextColor={Colors.placeHolderLightColor}
@@ -116,31 +125,45 @@ export default class CreateGroupScreen extends Component {
           <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>Description</Text>
           <TextInput
             style={Platform.OS === 'ios' ? pickerSelectStyles.inputIOS : pickerSelectStyles.inputAndroid}
-            onChangeText={(text) => this.setState({ text })}
+            onChangeText={(description) => this.setState({ description: description })}
             value={this.state.text}
             placeholder='Describe something about this...'
           />
           <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>Category</Text>
           <RNPickerSelect
-            placeholder={placeholder}
             items={categoryPlaces}
             onValueChange={(value) => {
               this.setState({
-                textInputValue: value,
+                category: value,
               });
             }}
             style={pickerSelectStyles}
-            value={this.state.textInputValue}
+            value={this.state.category}
             ref={(el) => {
-              this.inputRefs.textInputValue = el;
+              this.inputRefs.category = el;
             }}
           />
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ alignItems: 'center' }}>
             <Button
               title='Continue'
-              buttonStyle={styles.button}
+              // disabled={disabledButton}
+              buttonStyle={[
+                styles.button,
+                {
+                  backgroundColor: disabledButton ? undefined : Colors.tintColor,
+                  shadowColor: disabledButton ? undefined : Colors.tintColor,
+                },
+              ]}
               titleStyle={{ fontSize: TextSize.TEXT_MEDIUM_SIZE }}
-              onPress={() => this.props.navigation.navigate('CreateGroupScreen2')}
+              onPress={() => {
+                let groupInformation = {
+                  groupAvatar: this.state.groupAvatar,
+                  description: this.state.description,
+                  groupName: this.state.groupName,
+                  category: this.state.category,
+                };
+                this.props.navigation.navigate('CreateGroupScreen2', { groupInformation: groupInformation });
+              }}
             />
           </View>
         </View>
@@ -180,11 +203,9 @@ const styles = StyleSheet.create({
     margin: 30,
   },
   button: {
-    backgroundColor: Colors.tintColor,
     borderRadius: 4,
     height: Layout.window.height * 0.07,
-    width: '100%',
-    shadowColor: Colors.tintColor,
+    width: Layout.window.height * 0.3,
     shadowOffset: {
       width: 0,
       height: 9,
@@ -192,6 +213,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.35,
     shadowRadius: 9,
     elevation: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
@@ -200,9 +223,6 @@ const pickerSelectStyles = StyleSheet.create({
     fontSize: 16,
     paddingVertical: 12,
     paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 4,
     color: 'black',
     paddingRight: 30, // to ensure the text is never behind the icon
   },
@@ -210,9 +230,6 @@ const pickerSelectStyles = StyleSheet.create({
     fontSize: 16,
     paddingHorizontal: 10,
     paddingVertical: 8,
-    borderWidth: 0.5,
-    borderColor: 'gray',
-    borderRadius: 4,
     color: 'black',
     paddingRight: 30, // to ensure the text is never behind the icon
   },

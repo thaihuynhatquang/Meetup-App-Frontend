@@ -18,6 +18,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import SignInScreen from '../screens/AuthenticationScreen/SignInScreen';
 import SignUpScreen from '../screens/AuthenticationScreen/SignUpScreen';
 import AuthLoadingScreen from '../screens/AuthLoadingScreen';
+import AuthScreen from '../screens/AuthScreen';
 
 const GroupChatStack = createStackNavigator({
   GroupChatScreen: {
@@ -135,8 +136,9 @@ const AppStack = createStackNavigator(
 );
 
 const AuthStack = createSwitchNavigator({
-  SignIn: SignInScreen,
-  SignUp: SignUpScreen,
+  // SignIn: SignInScreen,
+  // SignUp: SignUpScreen,
+  AuthScreen: AuthScreen,
 });
 
 export default createAppContainer(
