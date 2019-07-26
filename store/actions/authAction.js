@@ -1,17 +1,42 @@
-import { GET_USER, GET_USER_SUCCESS, GET_USER_FAIL, REMOVE_USER } from './types';
+import {
+  GET_USER,
+  GET_USER_SUCCESS,
+  GET_USER_FAIL,
+  REMOVE_USER,
+  GET_TOKEN,
+  GET_TOKEN_SUCCESS,
+  GET_TOKEN_FAIL,
+} from './types';
 import axios from 'axios';
 import { API_URL } from '../../constants/services';
 import { Alert } from 'react-native';
 
-export const loginUser = (userInfo) => {
+export const getToken = (userInfo) => {
   return (dispatch, getState) => {
-    dispatch(loginUserStarted());
+    console.log(userInfo);
+    dispatch(getTokenStarted());
     axios
       .post(`${API_URL}/user/loginWithGoogle`, userInfo)
       .then((res) => {
         let data = res.data;
         axios.defaults.headers.common['authorization'] = data.token;
-        dispatch(loginUserSuccess(data.userInformation));
+        dispatch(getTokenSuccess(data.token));
+      })
+      .catch((err) => {
+        Alert.alert('Timeout of 0ms Exceeded. Server Error');
+        dispatch(getTokenFailure(err.message));
+      });
+  };
+};
+
+export const getUser = () => {
+  return (dispatch, getState) => {
+    dispatch(loginUserStarted());
+    axios
+      .get(`${API_URL}/user/auth`)
+      .then((res) => {
+        let data = res.data;
+        dispatch(loginUserSuccess(data));
       })
       .catch((err) => {
         Alert.alert('Timeout of 0ms Exceeded. Server Error');
@@ -25,6 +50,20 @@ export const logoutUser = () => {
     dispatch({ type: REMOVE_USER });
   };
 };
+
+const getTokenStarted = () => ({
+  type: GET_TOKEN,
+});
+
+const getTokenSuccess = (token) => ({
+  type: GET_TOKEN_SUCCESS,
+  token,
+});
+
+const getTokenFailure = (error) => ({
+  type: GET_TOKEN_FAIL,
+  error,
+});
 
 const loginUserStarted = () => ({
   type: GET_USER,

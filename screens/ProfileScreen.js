@@ -28,20 +28,21 @@ class ProfileScreen extends Component {
     onSignOut().then(() => this.props.navigation.navigate('AuthLoading'));
   };
   render() {
+    const { userInfo } = this.props;
     return (
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerContent}>
-            <Image style={styles.avatar} source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar1.png' }} />
+            <Image style={styles.avatar} source={{ uri: userInfo.avatar }} />
 
-            <Text style={styles.name}>John Doe</Text>
+            <Text style={styles.name}>{userInfo.name}</Text>
           </View>
         </View>
 
         <View style={styles.body}>
           <View style={styles.bodyContent}>
             <Text style={styles.textInfoBold}>Email:</Text>
-            <Text style={styles.textInfo}>johndoe@gmail.com</Text>
+            <Text style={styles.textInfo}>{userInfo.userName}</Text>
             <Text style={styles.textInfoBold}>Address:</Text>
             <Text style={styles.textInfo}>157 Pháo Đài Láng, Phường Láng Thượng, Quận Đống Đa, Hà Nội</Text>
           </View>
@@ -59,13 +60,16 @@ class ProfileScreen extends Component {
     );
   }
 }
+const mapStateToProps = (state) => ({
+  userInfo: state.authReducer.userInfo,
+});
 
 const mapDispatchToProps = (dispatch) => ({
   onLogout: () => dispatch(logoutUser()),
 });
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(ProfileScreen);
 

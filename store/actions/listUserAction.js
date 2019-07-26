@@ -10,7 +10,6 @@ export const listUser = () => {
       .get(`${API_URL}/user/`)
       .then((res) => {
         let data = res.data;
-        axios.defaults.headers.common['authorization'] = data.token;
         dispatch(getListUserSuccess(data));
       })
       .catch((err) => {

@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
 import TextSize from '../../constants/TextSize';
 import Colors from '../../constants/Colors';
-import { groups } from '../../data/SampleData';
+import { API_URL } from '../../constants/services';
 import { Icon } from 'react-native-elements';
 
-export default class GroupScreen extends Component {
+import { connect } from 'react-redux';
+
+class GroupScreen extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: 'Groups',
@@ -38,34 +40,36 @@ export default class GroupScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: groups,
+      data: this.props.listGroup,
     };
   }
 
-  renderGroupMembers = (group) => {
-    if (group.members) {
-      return (
-        <View style={styles.groupMembersContent}>
-          {group.members.map((prop, key) => {
-            return <Image key={key} style={styles.memberImage} source={{ uri: prop }} />;
-          })}
-        </View>
-      );
-    }
-    return null;
-  };
+  // renderGroupMembers = (group) => {
+  //   if (group.members) {
+  //     return (
+  //       <View style={styles.groupMembersContent}>
+  //         {group.members.map((prop, key) => {
+  //           return <Image key={key} style={styles.memberImage} source={{ uri: prop }} />;
+  //         })}
+  //       </View>
+  //     );
+  //   }
+  //   return null;
+  // };
 
   render() {
+    const { listGroup } = this.props;
+    console.log(listGroup);
     return (
       <FlatList
         style={styles.root}
-        data={this.state.data}
-        extraData={this.state}
+        data={listGroup}
+        // extraData={this.state}
         ItemSeparatorComponent={() => {
           return <View style={styles.separator} />;
         }}
-        keyExtractor={(item) => {
-          return item.id.toString();
+        keyExtractor={(item, index) => {
+          return index.toString();
         }}
         renderItem={(item) => {
           const Group = item.item;
@@ -74,16 +78,18 @@ export default class GroupScreen extends Component {
             mainContentStyle = styles.mainContent;
           }
           return (
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('GroupChatScreen')} style={styles.container}>
-              <Image source={{ uri: Group.image }} style={styles.avatar} />
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate('GroupChatScreen')}
+              style={styles.container}>
+              <Image source={{ uri: `${API_URL}${Group.groupAvatar}` }} style={styles.avatar} />
               <View style={styles.content}>
                 <View style={mainContentStyle}>
                   <View style={styles.text}>
-                    <Text style={styles.groupName}>{Group.name}</Text>
+                    <Text style={styles.groupName}>{Group.groupName}</Text>
                   </View>
-                  <Text style={styles.countMembers}>{Group.countMembers} members</Text>
-                  <Text style={styles.timeAgo}>Updated 2 months ago</Text>
-                  {this.renderGroupMembers(Group)}
+                  <Text style={styles.countMembers}>{Group.member.length} members</Text>
+                  <Text style={styles.category}>{Group.category}</Text>
+                  {/* {this.renderGroupMembers(Group)} */}
                 </View>
               </View>
             </TouchableOpacity>
@@ -93,6 +99,19 @@ export default class GroupScreen extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  listGroup: state.groupReducer.listGroup,
+});
+
+// const mapDispatchToProps = (dispatch) => ({
+//   onLogout: () => dispatch(logoutUser()),
+// });
+
+export default connect(
+  mapStateToProps,
+  null,
+)(GroupScreen);
 
 const styles = StyleSheet.create({
   root: {
@@ -136,7 +155,7 @@ const styles = StyleSheet.create({
   countMembers: {
     color: '#20B2AA',
   },
-  timeAgo: {
+  category: {
     fontSize: 12,
     color: '#696969',
   },

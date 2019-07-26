@@ -3,8 +3,8 @@ import { View, Image, Dimensions, StyleSheet, Alert } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { onSignIn, signInWithGoogleAsync } from '../utils/auth';
-import { loginUser } from '../store/actions/authAction';
-import { listUser } from '../store/actions/listUserAction';
+import { getToken } from '../store/actions/authAction';
+
 import Colors from '../constants/Colors';
 import Layout from '../constants/Layout';
 import TextSize from '../constants/TextSize';
@@ -19,15 +19,14 @@ class AuthScreen extends React.Component {
     });
   };
 
-  _onLogin = async (item) => {
-    await this.props.onLogin({ token: item.idToken, platform: item.platform });
+  _onLogin = (item) => {
+    this.props.getToken({ token: item.idToken, platform: item.platform });
   };
 
   shouldComponentUpdate(nextProps) {
-    if (nextProps.userInfo !== this.props.userInfo) {
-      onSignIn(nextProps.userInfo).then(() => {
-        this.props.getListUser();
-        nextProps.navigation.navigate('App');
+    if (nextProps.token !== this.props.token) {
+      onSignIn(nextProps.token).then(() => {
+        nextProps.navigation.navigate('AuthLoading');
       });
       return true;
     }
@@ -55,13 +54,11 @@ class AuthScreen extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  userInfo: state.authReducer.userInfo,
-  loginError: state.authReducer.error,
+  token: state.authReducer.token,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onLogin: (userInfo) => dispatch(loginUser(userInfo)),
-  getListUser: () => dispatch(listUser()),
+  getToken: (userInfo) => dispatch(getToken(userInfo)),
 });
 
 export default connect(

@@ -69,7 +69,6 @@ export default class CreateGroupScreen extends Component {
   };
 
   _pickImageFromExplorer = async () => {
-    console.log('PickImageS');
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [1, 1],

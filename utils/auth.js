@@ -3,10 +3,11 @@ import { iosClientId, androidClientId, API_URL } from '../constants/services';
 import { Google } from 'expo';
 import axios from 'axios';
 
-export const onSignIn = async (userInfo) => {
+export const onSignIn = async (token) => {
+  console.log("JHAHAHAHHHAH")
   try {
     await AsyncStorage.clear();
-    await AsyncStorage.setItem('userData', JSON.stringify(userInfo));
+    await AsyncStorage.setItem('token', token);
   } catch (error) {
     console.log('Something went wrong', error);
   }
@@ -16,30 +17,6 @@ export const onSignOut = async () => {
   try {
     await AsyncStorage.clear();
   } catch (error) {}
-};
-
-export const isSignedIn = async () => {
-  try {
-    let userData = await AsyncStorage.getItem('userData');
-    if (!userData) return false;
-    let data = JSON.parse(userData);
-    axios.defaults.headers.common['authorization'] = data.token;
-    await axios
-      .post(`${API_URL}/user/auth`, { token: data.token })
-      .then((res) => {
-        if (res.status !== 200) {
-          return true;
-        }
-      })
-      .catch((error) => {
-        Alert.alert(error);
-        return false;
-      });
-    return true;
-  } catch (error) {
-    console.log('Something went wrong', error);
-    return false;
-  }
 };
 
 export const signInWithGoogleAsync = async () => {

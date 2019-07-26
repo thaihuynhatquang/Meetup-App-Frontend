@@ -3,7 +3,6 @@ import { StyleSheet, Platform, FlatList, View } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { Text, Button, Container, Body, ListItem, Content, Thumbnail, Left, Header, Item, Input } from 'native-base';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { users } from '../../data/SampleData';
 import Colors from '../../constants/Colors';
 import TextSize from '../../constants/TextSize';
 import { connect } from 'react-redux';
@@ -62,13 +61,20 @@ class CreateGroupScreen2 extends Component {
   }
 
   createNewGroup = async () => {
-    let groupInformation = this.props.navigation.getParam('groupInformation');
-    groupInformation.member = [];
-    groupInformation.adminEmail = this.props.userInfo.userName || 'thaihuynhatquang@gmail.com';
+    let groupInformation = await this.props.navigation.getParam('groupInformation');
+    let listMember = [];
+    listMember.push(groupInformation.adminEmail);
+    this.state.data.forEach((item) => {
+      if (item.check === true) {
+        listMember.push(item.userName);
+      }
+    });
+
+    groupInformation.adminEmail = this.props.userInfo.userName;
     const bodyFormData = new FormData();
 
     const uri = groupInformation.groupAvatar;
-    if (uri != null) {
+    if (uri !== null) {
       const uriParts = uri.split('.');
       const fileType = uriParts[uriParts.length - 1];
       bodyFormData.append('groupAvatar', {
@@ -82,10 +88,9 @@ class CreateGroupScreen2 extends Component {
     bodyFormData.append('category', groupInformation.category);
     bodyFormData.append('description', groupInformation.description);
     bodyFormData.append('groupName', groupInformation.groupName);
-    bodyFormData.append('member', groupInformation.member);
+    bodyFormData.append('member', listMember);
 
-    console.log(bodyFormData);
-    await this.props.onCreateGroup(groupInformation);
+    await this.props.onCreateGroup(bodyFormData);
     this.props.navigation.navigate('GroupChatScreen');
   };
 
@@ -106,9 +111,9 @@ class CreateGroupScreen2 extends Component {
     value = event.nativeEvent.text;
     this.setState({ inputSearch: value });
     if (value && value !== '') {
-      this.setState({ data: this._filterListContacts(users, value) });
+      this.setState({ data: this._filterListContacts(this.state.data, value) });
     } else {
-      this.setState({ data: users });
+      this.setState({ data: this.props.listUser });
     }
   };
 
@@ -117,7 +122,7 @@ class CreateGroupScreen2 extends Component {
       <TouchableOpacity
         onPress={() => {
           item.checked = !item.checked;
-          this.setState({ data: users });
+          this.setState({ data: this.state.data });
         }}>
         <ListItem thumbnail selected noIndent>
           <Left>
@@ -161,7 +166,7 @@ class CreateGroupScreen2 extends Component {
             style={{ padding: 5 }}
             data={this.state.data}
             renderItem={(item) => this._renderItem(item)}
-            keyExtractor={(item) => item.name.toString()}
+            keyExtractor={(item, index) => index.toString()}
           />
         </Content>
       </Container>

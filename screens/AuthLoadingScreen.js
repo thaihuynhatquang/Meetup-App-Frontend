@@ -1,9 +1,11 @@
 import React from 'react';
 import { ActivityIndicator, AsyncStorage, StatusBar, Alert, View } from 'react-native';
+import { connect } from 'react-redux';
+import { getUser } from '../store/actions/authAction';
+import { listUser } from '../store/actions/listUserAction';
+import { listGroup } from '../store/actions/groupAction';
 import axios from 'axios';
-import { API_URL } from '../constants/services';
-
-export default class AuthLoadingScreen extends React.Component {
+class AuthLoadingScreen extends React.Component {
   constructor(props) {
     super(props);
     this._bootstrapAsync();
@@ -11,13 +13,18 @@ export default class AuthLoadingScreen extends React.Component {
 
   // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
-    this.props.navigation.navigate('Auth');
-
-    // This will switch to the App screen or Auth screen and this loading
-    // screen will be unmounted and thrown away.
+    const token = await AsyncStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['authorization'] = token;
+      await this.props.getUser();
+      await this.props.getListUser();
+      await this.props.getListGroup();
+      this.props.navigation.navigate('App');
+    } else {
+      this.props.navigation.navigate('Auth');
+    }
   };
 
-  // Render any loading content that you like here
   render() {
     return (
       <View>
@@ -27,3 +34,14 @@ export default class AuthLoadingScreen extends React.Component {
     );
   }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+  getUser: () => dispatch(getUser()),
+  getListUser: () => dispatch(listUser()),
+  getListGroup: () => dispatch(listGroup()),
+});
+
+export default connect(
+  null,
+  mapDispatchToProps,
+)(AuthLoadingScreen);
