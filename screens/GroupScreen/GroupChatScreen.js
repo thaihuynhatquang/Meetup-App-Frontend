@@ -11,10 +11,10 @@ const currentUser = {
   avatar: 'https://placeimg.com/140/140/any',
 };
 
-export default class Chat extends React.Component {
+export default class GroupChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: 'Groups Detail',
+      title: 'Groups Chat',
       headerStyle: {
         // backgroundColor: Colors.tintColor,
       },
@@ -44,7 +44,7 @@ export default class Chat extends React.Component {
           iconStyle={{
             marginRight: 15,
           }}
-          onPress={() => {}}
+          onPress={() => navigation.navigate('GroupDetailScreen')}
         />
       ),
     };

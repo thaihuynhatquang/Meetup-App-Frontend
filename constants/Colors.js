@@ -15,5 +15,6 @@ export default {
   placeHolderLightColor: '#ccc',
   dodger_blue: '#428AF8',
   silver: '#BEBEBE',
-  torch_red: '#F8262F'
+  torch_red: '#F8262F',
+  disableInputBackground: '#D3D3D3'
 };

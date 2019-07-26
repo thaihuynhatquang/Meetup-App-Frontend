@@ -6,8 +6,10 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { users } from '../../data/SampleData';
 import Colors from '../../constants/Colors';
 import TextSize from '../../constants/TextSize';
+import { connect } from 'react-redux';
+import { createGroup } from '../../store/actions/groupAction';
 
-export default class CreateGroupScreen2 extends Component {
+class CreateGroupScreen2 extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
       title: 'New Meeting',
@@ -34,7 +36,11 @@ export default class CreateGroupScreen2 extends Component {
       headerRight: (
         <View style={{ justifyContent: 'center', marginRight: 5 }}>
           <Button
-            onPress={() => navigation.navigate('DetailGroupScreen')}
+            onPress={() => {
+              if (navigation.getParam('createNewGroup', null)) {
+                return navigation.getParam('createNewGroup')();
+              }
+            }}
             small
             rounded
             style={{ backgroundColor: Colors.tintColor }}>
@@ -48,10 +54,45 @@ export default class CreateGroupScreen2 extends Component {
     };
   };
 
+  async componentDidMount() {
+    await this.props.navigation.setParams({
+      createNewGroup: () => this.createNewGroup(),
+    });
+    console.log(this.props.listUser);
+  }
+
+  createNewGroup = async () => {
+    let groupInformation = this.props.navigation.getParam('groupInformation');
+    groupInformation.member = [];
+    groupInformation.adminEmail = this.props.userInfo.userName || 'thaihuynhatquang@gmail.com';
+    const bodyFormData = new FormData();
+
+    const uri = groupInformation.groupAvatar;
+    if (uri != null) {
+      const uriParts = uri.split('.');
+      const fileType = uriParts[uriParts.length - 1];
+      bodyFormData.append('groupAvatar', {
+        uri,
+        name: `groupAvatar.${fileType}`,
+        type: `image/${fileType}`,
+      });
+    }
+
+    bodyFormData.append('adminEmail', groupInformation.adminEmail);
+    bodyFormData.append('category', groupInformation.category);
+    bodyFormData.append('description', groupInformation.description);
+    bodyFormData.append('groupName', groupInformation.groupName);
+    bodyFormData.append('member', groupInformation.member);
+
+    console.log(bodyFormData);
+    await this.props.onCreateGroup(groupInformation);
+    this.props.navigation.navigate('GroupChatScreen');
+  };
+
   constructor(props) {
     super(props);
     this.state = {
-      data: users,
+      data: this.props.listUser,
       inputSearch: null,
       selectedData: [],
     };
@@ -77,11 +118,10 @@ export default class CreateGroupScreen2 extends Component {
         onPress={() => {
           item.checked = !item.checked;
           this.setState({ data: users });
-          console.log(item.checked);
         }}>
         <ListItem thumbnail selected noIndent>
           <Left>
-            <Thumbnail small source={{ uri: item.image }} />
+            <Thumbnail small source={{ uri: item.avatar }} />
           </Left>
           <Body>
             <Text style={{ fontWeight: 'bold', color: Colors.tintColor }}>{item.name}</Text>
@@ -121,12 +161,26 @@ export default class CreateGroupScreen2 extends Component {
             style={{ padding: 5 }}
             data={this.state.data}
             renderItem={(item) => this._renderItem(item)}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item.name.toString()}
           />
         </Content>
       </Container>
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  userInfo: state.authReducer.userInfo,
+  listUser: state.listUserReducer.listUser,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  onCreateGroup: (groupInformation) => dispatch(createGroup(groupInformation)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(CreateGroupScreen2);
 
 const styles = StyleSheet.create({});
