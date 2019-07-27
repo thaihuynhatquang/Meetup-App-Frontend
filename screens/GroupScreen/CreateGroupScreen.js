@@ -11,7 +11,10 @@ import TextSize from '../../constants/TextSize';
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout';
 
-export default class CreateGroupScreen extends Component {
+import { createGroup, listGroup } from '../../store/actions/groupAction';
+import { connect } from 'react-redux';
+
+class CreateGroupScreen extends Component {
   static navigationOptions = ({ navigation }) => {
     const prevRoute = navigation.getParam('prevRoute', 'HomeScreen');
     return {
@@ -75,12 +78,37 @@ export default class CreateGroupScreen extends Component {
     });
 
     if (!result.cancelled) {
-      console.log('result: ', result);
       this.setState({ groupAvatar: result.uri });
       return Promise.resolve(result);
     }
-    console.log('Reject');
     return Promise.reject();
+  };
+
+  createNewGroup = async (groupInformation) => {
+    const bodyFormData = new FormData();
+
+    const uri = groupInformation.groupAvatar;
+    if (uri !== null) {
+      const uriParts = uri.split('.');
+      const fileType = uriParts[uriParts.length - 1];
+      bodyFormData.append('groupAvatar', {
+        uri,
+        name: `groupAvatar.${fileType}`,
+        type: `image/${fileType}`,
+      });
+    }
+
+    bodyFormData.append('adminEmail', this.props.userInfo.userName);
+    bodyFormData.append('category', groupInformation.category);
+    bodyFormData.append('description', groupInformation.description);
+    bodyFormData.append('groupName', groupInformation.groupName);
+    await this.props.onCreateGroup(bodyFormData);
+
+    setTimeout(() => {
+      this.props.reloadListGroup();
+    }, 1000);
+
+    await this.props.navigation.navigate('GroupChatScreen');
   };
 
   render() {
@@ -154,8 +182,9 @@ export default class CreateGroupScreen extends Component {
                   description: this.state.description,
                   groupName: this.state.groupName,
                   category: this.state.category,
+                  adminEmail: this.props.userInfo.userName,
                 };
-                this.props.navigation.navigate('CreateGroupScreen2', { groupInformation: groupInformation });
+                this.createNewGroup(groupInformation);
               }}
             />
           </View>
@@ -164,6 +193,21 @@ export default class CreateGroupScreen extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  userInfo: state.authReducer.userInfo,
+  listUser: state.listUserReducer.listUser,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  onCreateGroup: (groupInformation) => dispatch(createGroup(groupInformation)),
+  reloadListGroup: () => dispatch(listGroup()),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(CreateGroupScreen);
 
 const styles = StyleSheet.create({
   container: {

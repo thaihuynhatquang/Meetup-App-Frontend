@@ -26,9 +26,15 @@ export default class CustomActions extends React.Component {
     this.setState({ isShowPlanMeetup: true });
   };
 
+  addMember = () => {
+    this.props.addMember();
+  };
+
   onActionsPress = () => {
-    const options = ['Set Location', 'Set List Free Time', 'Set Plan For Meetup', 'Cancel'];
-    const cancelButtonIndex = options.length - 1;
+    const options = this.props.isAdminGroup
+      ? ['Cancel', 'Set Location', 'Set List Free Time', 'Set Plan For Meetup', 'Add member']
+      : ['Cancel', 'Set Location', 'Set List Free Time'];
+    const cancelButtonIndex = 0;
     this.context.actionSheet().showActionSheetWithOptions(
       {
         options,
@@ -37,21 +43,20 @@ export default class CustomActions extends React.Component {
       async (buttonIndex) => {
         const { onSend } = this.props;
         switch (buttonIndex) {
-          // case 0:
-          //   pickImageAsync(onSend);
-          //   return;
-          // case 1:
-          //   takePictureAsync(onSend);
-          //   return;
-          case 0:
+          case 1:
             this.pickLocation();
             return;
-          case 1:
+          case 2:
             this.pickDateTimeRange();
             return;
-          case 2:
+          case 3:
             this.setPlanMeetup();
+            return;
+          case 4:
+            this.addMember();
+            return;
           default:
+            return;
         }
       },
     );

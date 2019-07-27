@@ -12,7 +12,7 @@ import { Alert } from 'react-native';
 
 export const createGroup = (groupInformation) => {
   return (dispatch, getState) => {
-    dispatch(createGroupStarted());
+    dispatch(fetchGroupStarted());
     axios({
       method: 'post',
       url: `${API_URL}/group/`,
@@ -21,25 +21,57 @@ export const createGroup = (groupInformation) => {
     })
       .then((res) => {
         let data = res.data;
-        dispatch(createGroupSuccess(data));
+        dispatch(fetchGroupSuccess(data));
       })
       .catch((err) => {
         Alert.alert('Timeout of 0ms Exceeded. Server Error');
-        dispatch(createGroupFailure(err.message));
+        dispatch(fetchGroupFailure(err.message));
       });
   };
 };
 
-const createGroupStarted = () => ({
+export const addMember = (groupID, listMemberID) => {
+  return (dispatch, getState) => {
+    dispatch(fetchGroupStarted());
+    axios
+      .put(`${API_URL}/group/updateGroupMembers`, { groupID, listMemberID })
+      .then((res) => {
+        let data = res.data;
+        dispatch(fetchGroupSuccess(data));
+      })
+      .catch((err) => {
+        Alert.alert('Timeout of 0ms Exceeded. Server Error');
+        dispatch(fetchGroupFailure(err.message));
+      });
+  };
+};
+
+export const getGroup = (groupID) => {
+  return (dispatch, getState) => {
+    dispatch(fetchGroupStarted());
+    axios
+      .post(`${API_URL}/group/groupID`, groupID)
+      .then((res) => {
+        let data = res.data;
+        dispatch(fetchGroupSuccess(data));
+      })
+      .catch((err) => {
+        Alert.alert('Timeout of 0ms Exceeded. Server Error');
+        dispatch(fetchGroupFailure(err.message));
+      });
+  };
+};
+
+const fetchGroupStarted = () => ({
   type: CREATE_GROUP,
 });
 
-const createGroupSuccess = (groupInformation) => ({
+const fetchGroupSuccess = (groupInformation) => ({
   type: CREATE_GROUP_SUCCESS,
   groupInformation,
 });
 
-const createGroupFailure = (error) => ({
+const fetchGroupFailure = (error) => ({
   type: CREATE_GROUP_FAIL,
   error,
 });

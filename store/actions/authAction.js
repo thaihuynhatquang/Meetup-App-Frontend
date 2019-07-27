@@ -13,7 +13,6 @@ import { Alert } from 'react-native';
 
 export const getToken = (userInfo) => {
   return (dispatch, getState) => {
-    console.log(userInfo);
     dispatch(getTokenStarted());
     axios
       .post(`${API_URL}/user/loginWithGoogle`, userInfo)

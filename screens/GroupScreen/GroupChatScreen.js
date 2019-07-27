@@ -6,14 +6,17 @@ import { Icon } from 'react-native-elements';
 import GroupChatAction from '../../components/GroupChatAction';
 import { Platform } from 'react-native';
 
+import { connect } from 'react-redux';
+
 const currentUser = {
   _id: 1,
   avatar: 'https://placeimg.com/140/140/any',
 };
 
-export default class GroupChatScreen extends React.Component {
+class GroupChatScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
+      gesturesEnabled: false,
       title: 'Groups Chat',
       headerStyle: {
         // backgroundColor: Colors.tintColor,
@@ -114,6 +117,9 @@ export default class GroupChatScreen extends React.Component {
   };
 
   render() {
+    const { userInfo, groupInfo } = this.props;
+    console.log(userInfo.username, 'username');
+    console.log(groupInfo.adminEmail, 'admin');
     return (
       <GiftedChat
         messages={this.state.messages}
@@ -136,9 +142,26 @@ export default class GroupChatScreen extends React.Component {
         }}
         user={currentUser}
         renderActions={(props) => {
-          return <GroupChatAction {...props} onSend={this.onSendFromUser} />;
+          return (
+            <GroupChatAction
+              {...props}
+              isAdminGroup={groupInfo.adminEmail === userInfo.userName}
+              onSend={this.onSendFromUser}
+              addMember={() => this.props.navigation.navigate('AddMemberScreen')}
+            />
+          );
         }}
       />
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  userInfo: state.authReducer.userInfo,
+  groupInfo: state.groupReducer.groupInformation,
+});
+
+export default connect(
+  mapStateToProps,
+  null,
+)(GroupChatScreen);

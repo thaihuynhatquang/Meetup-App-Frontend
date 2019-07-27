@@ -6,6 +6,7 @@ import { API_URL } from '../../constants/services';
 import { Icon } from 'react-native-elements';
 
 import { connect } from 'react-redux';
+import { getGroup } from '../../store/actions/groupAction';
 
 class GroupScreen extends Component {
   static navigationOptions = ({ navigation }) => {
@@ -44,27 +45,25 @@ class GroupScreen extends Component {
     };
   }
 
-  // renderGroupMembers = (group) => {
-  //   if (group.members) {
-  //     return (
-  //       <View style={styles.groupMembersContent}>
-  //         {group.members.map((prop, key) => {
-  //           return <Image key={key} style={styles.memberImage} source={{ uri: prop }} />;
-  //         })}
-  //       </View>
-  //     );
-  //   }
-  //   return null;
-  // };
+  componentDidMount() {
+    this.setState({ data: this.props.listGroup });
+  }
+
+  shouldComponentUpdate(nextProps) {
+    if (nextProps.listGroup !== this.props.listGroup) {
+      this.setState({ data: nextProps.listGroup });
+      return true;
+    }
+    return false;
+  }
 
   render() {
-    const { listGroup } = this.props;
-    console.log(listGroup);
+    const { data } = this.state;
     return (
       <FlatList
         style={styles.root}
-        data={listGroup}
-        // extraData={this.state}
+        data={data}
+        extraData={this.props.listGroup}
         ItemSeparatorComponent={() => {
           return <View style={styles.separator} />;
         }}
@@ -79,7 +78,14 @@ class GroupScreen extends Component {
           }
           return (
             <TouchableOpacity
-              onPress={() => this.props.navigation.navigate('GroupChatScreen')}
+              onPress={() => {
+                const groupID = Group.groupName + '.' + Group.adminEmail;
+                const object = {
+                  groupID: groupID,
+                };
+                this.props.getGroup(object);
+                this.props.navigation.navigate('GroupChatScreen');
+              }}
               style={styles.container}>
               <Image source={{ uri: `${API_URL}${Group.groupAvatar}` }} style={styles.avatar} />
               <View style={styles.content}>
@@ -87,9 +93,8 @@ class GroupScreen extends Component {
                   <View style={styles.text}>
                     <Text style={styles.groupName}>{Group.groupName}</Text>
                   </View>
-                  <Text style={styles.countMembers}>{Group.member.length} members</Text>
+                  <Text style={styles.countMembers}>{Group.member ? Group.member.length : '1'} members</Text>
                   <Text style={styles.category}>{Group.category}</Text>
-                  {/* {this.renderGroupMembers(Group)} */}
                 </View>
               </View>
             </TouchableOpacity>
@@ -104,13 +109,13 @@ const mapStateToProps = (state) => ({
   listGroup: state.groupReducer.listGroup,
 });
 
-// const mapDispatchToProps = (dispatch) => ({
-//   onLogout: () => dispatch(logoutUser()),
-// });
+const mapDispatchToProps = (dispatch) => ({
+  getGroup: (groupID) => dispatch(getGroup(groupID)),
+});
 
 export default connect(
   mapStateToProps,
-  null,
+  mapDispatchToProps,
 )(GroupScreen);
 
 const styles = StyleSheet.create({

@@ -8,14 +8,7 @@ import {
 } from '../actions/types';
 
 const initialState = {
-  groupInformation: {
-    id: '',
-    name: '',
-    category: '',
-    adminID: '',
-    member: [],
-    avatar: '',
-  },
+  groupInformation: {},
   listGroup: [],
   loadingGroup: false,
   loadingListGroup: false,
@@ -28,14 +21,7 @@ export default (groupReducer = (state = initialState, action) => {
       return {
         ...state,
         loadingGroup: true,
-        groupInformation: {
-          id: '',
-          name: '',
-          category: '',
-          adminID: '',
-          member: [],
-          avatar: '',
-        },
+        groupInformation: {},
       };
     case CREATE_GROUP_SUCCESS:
       return {
@@ -48,14 +34,7 @@ export default (groupReducer = (state = initialState, action) => {
         ...state,
         loadingGroup: false,
         error: action.error,
-        groupInformation: {
-          id: '',
-          name: '',
-          category: '',
-          adminID: '',
-          member: [],
-          avatar: '',
-        },
+        groupInformation: {},
       };
     case GET_LIST_GROUP:
       return { ...state, loadingListGroup: true };

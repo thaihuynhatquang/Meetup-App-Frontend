@@ -6,11 +6,14 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import Colors from '../../constants/Colors';
 import TextSize from '../../constants/TextSize';
 import { connect } from 'react-redux';
-import { createGroup } from '../../store/actions/groupAction';
+import { listGroup, addMember } from '../../store/actions/groupAction';
+import axios from 'axios';
+import { API_URL } from '../../constants/services';
 
-class CreateGroupScreen2 extends Component {
+class AddMemberScreen extends Component {
   static navigationOptions = ({ navigation }) => {
     return {
+      gesturesEnabled: false,
       title: 'New Meeting',
       headerStyle: {
         // backgroundColor: Colors.tintColor,
@@ -22,28 +25,28 @@ class CreateGroupScreen2 extends Component {
       },
       headerLeft: (
         <Icon
-          name={Platform.OS === 'ios' ? 'ios-arrow-back' : 'md-arrow-back'}
+          name={Platform.OS === 'ios' ? 'ios-close' : 'md-close'}
           type='ionicon'
-          size={28}
+          size={35}
           color={Colors.tintColor}
           iconStyle={{
             marginLeft: 15,
           }}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate('GroupChatScreen')}
         />
       ),
       headerRight: (
         <View style={{ justifyContent: 'center', marginRight: 5 }}>
           <Button
             onPress={() => {
-              if (navigation.getParam('createNewGroup', null)) {
-                return navigation.getParam('createNewGroup')();
+              if (navigation.getParam('addMember', null)) {
+                return navigation.getParam('addMember')();
               }
             }}
             small
             rounded
             style={{ backgroundColor: Colors.tintColor }}>
-            <Text>Done</Text>
+            <Text>Add</Text>
           </Button>
         </View>
       ),
@@ -55,71 +58,62 @@ class CreateGroupScreen2 extends Component {
 
   async componentDidMount() {
     await this.props.navigation.setParams({
-      createNewGroup: () => this.createNewGroup(),
+      addMember: () => this.addMember(),
     });
-    console.log(this.props.listUser);
+    await this.setState({
+      currentListMember: this.props.groupInfo.member || [],
+    });
   }
 
-  createNewGroup = async () => {
-    let groupInformation = await this.props.navigation.getParam('groupInformation');
-    let listMember = [];
-    listMember.push(groupInformation.adminEmail);
+  addMember = async () => {
+    let listMemberID = [];
     this.state.data.forEach((item) => {
-      if (item.check === true) {
-        listMember.push(item.userName);
+      if (item.checked === true) {
+        listMemberID.push(item.userName);
       }
     });
 
-    groupInformation.adminEmail = this.props.userInfo.userName;
-    const bodyFormData = new FormData();
+    let groupID = this.props.groupInfo.groupName + '.' + this.props.userInfo.userName;
+    await this.props.addMember(groupID, listMemberID);
+    setTimeout(() => {
+      this.props.listGroup();
+    }, 3000);
 
-    const uri = groupInformation.groupAvatar;
-    if (uri !== null) {
-      const uriParts = uri.split('.');
-      const fileType = uriParts[uriParts.length - 1];
-      bodyFormData.append('groupAvatar', {
-        uri,
-        name: `groupAvatar.${fileType}`,
-        type: `image/${fileType}`,
-      });
-    }
-
-    bodyFormData.append('adminEmail', groupInformation.adminEmail);
-    bodyFormData.append('category', groupInformation.category);
-    bodyFormData.append('description', groupInformation.description);
-    bodyFormData.append('groupName', groupInformation.groupName);
-    bodyFormData.append('member', listMember);
-
-    await this.props.onCreateGroup(bodyFormData);
     this.props.navigation.navigate('GroupChatScreen');
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      data: this.props.listUser,
+      data: [],
       inputSearch: null,
-      selectedData: [],
+      currentListMember: [],
     };
   }
-
-  _filterListContacts = (users, filterValue) => {
-    return users.filter((user) => user.name.includes(filterValue));
-  };
 
   _handleSearchEvent = (event) => {
     value = event.nativeEvent.text;
     this.setState({ inputSearch: value });
     if (value && value !== '') {
-      this.setState({ data: this._filterListContacts(this.state.data, value) });
+      axios
+        .get(`${API_URL}/user/search`, { params: { userName: value } })
+        .then((res) => {
+          let data = res.data;
+          this.setState({ data: data });
+        })
+        .catch((err) => {
+          Alert.alert('Timeout of 0ms Exceeded. Server Error');
+        });
     } else {
-      this.setState({ data: this.props.listUser });
+      this.setState({ data: [] });
     }
   };
 
   _renderItem = ({ item }) => {
+    // if (item.userName !== this.props.userInfo.userName)
     return (
       <TouchableOpacity
+        disabled={this.state.currentListMember.includes(item.userName)}
         onPress={() => {
           item.checked = !item.checked;
           this.setState({ data: this.state.data });
@@ -131,7 +125,9 @@ class CreateGroupScreen2 extends Component {
           <Body>
             <Text style={{ fontWeight: 'bold', color: Colors.tintColor }}>{item.name}</Text>
           </Body>
-          {item.checked ? (
+          {this.state.currentListMember.includes(item.userName) ? (
+            <Text style={{ color: Colors.tintColor }}>Joined</Text>
+          ) : item.checked ? (
             <Icon
               name={Platform.OS === 'ios' ? 'ios-checkmark-circle' : 'md-checkmark-circle'}
               iconStyle={{ color: Colors.tintColor, fontSize: 24 }}
@@ -149,6 +145,7 @@ class CreateGroupScreen2 extends Component {
         </ListItem>
       </TouchableOpacity>
     );
+    // else return null;
   };
 
   render() {
@@ -157,7 +154,12 @@ class CreateGroupScreen2 extends Component {
         <Header searchBar rounded style={{ paddingBottom: 10 }}>
           <Item style={{ alignSelf: 'center', paddingLeft: 10, paddingRight: 10 }}>
             <Icon name={Platform.OS === 'ios' ? 'ios-search' : 'md-search'} type='ionicon' color={Colors.tintColor} />
-            <Input placeholder='Search' value={this.state.inputSearch} onChange={this._handleSearchEvent} />
+            <Input
+              placeholder='Search'
+              value={this.state.inputSearch}
+              onChangeText={(text) => this.setState({ inputSearch: text })}
+              onSubmitEditing={this._handleSearchEvent}
+            />
             <Icon name={Platform.OS === 'ios' ? 'ios-people' : 'md-people'} type='ionicon' color={Colors.tintColor} />
           </Item>
         </Header>
@@ -176,16 +178,18 @@ class CreateGroupScreen2 extends Component {
 
 const mapStateToProps = (state) => ({
   userInfo: state.authReducer.userInfo,
+  groupInfo: state.groupReducer.groupInformation,
   listUser: state.listUserReducer.listUser,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onCreateGroup: (groupInformation) => dispatch(createGroup(groupInformation)),
+  listGroup: () => dispatch(listGroup()),
+  addMember: (groupID, listMemberID) => dispatch(addMember(groupID, listMemberID)),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(CreateGroupScreen2);
+)(AddMemberScreen);
 
 const styles = StyleSheet.create({});

@@ -11,7 +11,7 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import ListGroupScreen from '../screens/GroupScreen/ListGroupScreen';
 import CreateGroupScreen from '../screens/GroupScreen/CreateGroupScreen';
-import CreateGroupScreen2 from '../screens/GroupScreen/CreateGroupScreen2';
+import AddMemberScreen from '../screens/GroupScreen/AddMemberScreen';
 import GroupChatScreen from '../screens/GroupScreen/GroupChatScreen';
 import GroupDetailScreen from '../screens/GroupScreen/GroupDetailScreen';
 import ProfileScreen from '../screens/ProfileScreen';
@@ -35,9 +35,9 @@ const ModalGroupStack = createStackNavigator(
       screen: CreateGroupScreen,
       path: 'group/:create',
     },
-    CreateGroupScreen2: {
-      screen: CreateGroupScreen2,
-      path: 'group/:create2',
+    AddMemberScreen: {
+      screen: AddMemberScreen,
+      path: 'group/:addMember',
     },
   },
   {

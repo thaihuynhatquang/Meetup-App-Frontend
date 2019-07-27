@@ -23,6 +23,8 @@ import TextSize from '../../constants/TextSize';
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout';
 
+import { connect } from 'react-redux';
+
 export default class GroupDetailScreen extends Component {
   state = {
     image: null,
@@ -36,6 +38,7 @@ export default class GroupDetailScreen extends Component {
 
   static navigationOptions = ({ navigation }) => {
     const { state } = navigation;
+    console.log("HAHAHA", navigation)
     return {
       title: 'Groups Detail',
       headerTitleStyle: {

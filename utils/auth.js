@@ -4,7 +4,6 @@ import { Google } from 'expo';
 import axios from 'axios';
 
 export const onSignIn = async (token) => {
-  console.log("JHAHAHAHHHAH")
   try {
     await AsyncStorage.clear();
     await AsyncStorage.setItem('token', token);
