@@ -23,22 +23,26 @@ import TextSize from '../../constants/TextSize';
 import Colors from '../../constants/Colors';
 import Layout from '../../constants/Layout';
 
-import { connect } from 'react-redux';
+import DatePicker from 'react-native-datepicker';
 
-export default class GroupDetailScreen extends Component {
+import { connect } from 'react-redux';
+import { API_URL } from '../../constants/services';
+import { FlatList } from 'react-native-gesture-handler';
+class GroupDetailScreen extends Component {
   state = {
-    image: null,
+    groupAvatar: null,
+    description: 'Nothing here',
+    groupName: null,
     hasExplorePermission: null,
     type: Camera.Constants.Type.back,
+    startDate: null,
+    endDate: null,
     editMode: false,
-    groupName: 'Group Name',
-    textInputValue: 'Eating',
-    description: 'Nothing here',
+    category: null,
   };
 
   static navigationOptions = ({ navigation }) => {
     const { state } = navigation;
-    console.log("HAHAHA", navigation)
     return {
       title: 'Groups Detail',
       headerTitleStyle: {
@@ -60,19 +64,19 @@ export default class GroupDetailScreen extends Component {
       ),
       headerRight: (
         <View style={{ justifyContent: 'center', marginRight: 5 }}>
-          <NativeBaseComponent.Button
-            onPress={() => {
-              if (navigation.getParam('handleMode', null)) {
+          {navigation.getParam('isAdmin', false) === true ? (
+            <NativeBaseComponent.Button
+              onPress={() => {
                 return navigation.getParam('handleMode')();
-              }
-            }}
-            small
-            rounded
-            style={{ backgroundColor: Colors.tintColor }}>
-            <NativeBaseComponent.Text>
-              {navigation.getParam('editMode', false) === true ? 'Save' : 'Edit'}
-            </NativeBaseComponent.Text>
-          </NativeBaseComponent.Button>
+              }}
+              small
+              rounded
+              style={{ backgroundColor: Colors.tintColor }}>
+              <NativeBaseComponent.Text>
+                {navigation.getParam('editMode', false) === true ? 'Save' : 'Edit'}
+              </NativeBaseComponent.Text>
+            </NativeBaseComponent.Button>
+          ) : null}
         </View>
       ),
     };
@@ -80,8 +84,19 @@ export default class GroupDetailScreen extends Component {
 
   async componentDidMount() {
     await this.props.navigation.setParams({ handleMode: () => this.switchMode() });
+    const isAdmin = this.props.groupInfo.adminEmail == this.props.userInfo.userName;
+    await this.props.navigation.setParams({ isAdmin: isAdmin });
     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    const { groupInfo } = this.props;
     this.setState({ hasExplorePermission: status === 'granted' });
+    this.setState({
+      groupAvatar: API_URL + groupInfo.groupAvatar,
+      groupName: groupInfo.groupName,
+      description: groupInfo.description,
+      category: groupInfo.category,
+      endDate: new Date(parseInt(groupInfo.endDate)),
+      startDate: new Date(parseInt(groupInfo.startDate)),
+    });
   }
 
   _getSelectedPickerValue = () => {
@@ -95,7 +110,7 @@ export default class GroupDetailScreen extends Component {
     });
 
     if (!result.cancelled) {
-      this.setState({ image: result.uri });
+      this.setState({ groupAvatar: result.uri });
       return Promise.resolve(result);
     }
 
@@ -110,7 +125,7 @@ export default class GroupDetailScreen extends Component {
   };
 
   render() {
-    const { image, editMode } = this.state;
+    const { groupAvatar, editMode, groupName, description, category, startDate, endDate } = this.state;
     const placeholder = {
       label: 'Select category place...',
       value: null,
@@ -127,24 +142,23 @@ export default class GroupDetailScreen extends Component {
                   .catch((e) => console.log(e))
               }
               disabled={!editMode}>
-              {image ? (
-                <NativeBaseComponent.Thumbnail
-                  large
+              {groupAvatar ? (
+                <Image
                   style={[styles.avatar, { borderColor: editMode ? 'white' : Colors.disableInputBackground }]}
-                  source={{ uri: image }}
+                  source={{ uri: groupAvatar }}
                 />
               ) : (
-                <NativeBaseComponent.Thumbnail
-                  large
+                <Image
                   style={[styles.avatar, { borderColor: editMode ? 'white' : Colors.disableInputBackground }]}
-                  source={{ uri: 'https://uphinh.org/images/2019/07/18/Untitled-16446da271a5f9b7c.png' }}
+                  source={{ uri: groupAvatar }}
                 />
               )}
             </TouchableOpacity>
             <Input
-              inputStyle={[styles.name, { color: editMode ? '#FFFFFF' : Colors.silver }]}
-              value={this.state.groupName}
+              inputStyle={[styles.name, { color: editMode ? Colors.silver : '#fff' }]}
+              value={groupName}
               editable={editMode}
+              onChangeText={(text) => this.setState({ groupName: text })}
             />
           </View>
         </View>
@@ -152,8 +166,8 @@ export default class GroupDetailScreen extends Component {
           <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>Description</Text>
           <TextInput
             style={[styles.textInput, { backgroundColor: editMode ? 'white' : Colors.disableInputBackground }]}
-            onChangeText={(text) => this.setState({ text })}
-            value={this.state.description}
+            onChangeText={(text) => this.setState({ description: text })}
+            value={description}
             placeholder='Describe something about this...'
             placeholderTextColor={Colors.placeHolderLightColor}
             editable={editMode}
@@ -164,40 +178,151 @@ export default class GroupDetailScreen extends Component {
             items={categoryPlaces}
             onValueChange={(value) => {
               this.setState({
-                textInputValue: value,
+                category: value,
               });
             }}
             style={{
               inputIOS: [styles.textInput, { backgroundColor: editMode ? 'white' : Colors.disableInputBackground }],
               inputAndroid: [styles.textInput, { backgroundColor: editMode ? 'white' : Colors.disableInputBackground }],
             }}
-            value={this.state.textInputValue}
+            value={category}
             placeholderTextColor={Colors.placeHolderLightColor}
             disabled={!editMode}
           />
-          <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>Description</Text>
-          <TextInput
-            style={[styles.textInput, { backgroundColor: editMode ? 'white' : Colors.disableInputBackground }]}
-            onChangeText={(text) => this.setState({ text })}
-            value={this.state.description}
-            placeholder='Describe something about this...'
-            placeholderTextColor={Colors.placeHolderLightColor}
-            editable={editMode}
-          />
-          <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>Description</Text>
-          <TextInput
-            style={[styles.textInput, { backgroundColor: editMode ? 'white' : Colors.disableInputBackground }]}
-            onChangeText={(text) => this.setState({ text })}
-            value={this.state.description}
-            placeholder='Describe something about this...'
-            placeholderTextColor={Colors.placeHolderLightColor}
-            editable={editMode}
-          />
+
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <View>
+              <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>From Date</Text>
+              <DatePicker
+                style={{ flex: 1 }}
+                disabled={!editMode}
+                date={startDate}
+                mode='date'
+                showIcon={false}
+                placeholder='select date'
+                confirmBtnText='Confirm'
+                cancelBtnText='Cancel'
+                customStyles={{
+                  dateIcon: null,
+                  disabled: {
+                    backgroundColor: Colors.disableInputBackground,
+                    alignItems: 'flex-start',
+                    justifyContent: 'center',
+                    paddingLeft: 10,
+                    borderWidth: 1,
+                    borderColor: 'gray',
+                    color: 'black',
+                    borderRadius: 4,
+
+                    paddingRight: 30, // to ensure the text is never behind the icon
+                  },
+                  dateInput: {
+                    backgroundColor: 'white',
+                    alignItems: 'flex-start',
+                    justifyContent: 'center',
+                    paddingLeft: 10,
+                    borderWidth: 1,
+                    borderColor: 'gray',
+                    color: 'black',
+                    borderRadius: 4,
+
+                    paddingRight: 30, // to ensure the text is never behind the icon
+                  },
+                  dateText: {
+                    fontSize: 16,
+                    color: 'black',
+                  },
+                  btnTextConfirm: {
+                    color: Colors.tintColor,
+                    fontWeight: '600',
+                  },
+                  btnTextCancel: {
+                    color: Colors.tintColor,
+                    fontWeight: '600',
+                  },
+                }}
+                onDateChange={(date) => this.setState({ toDate: date })}
+              />
+            </View>
+            <View>
+              <Text style={{ marginTop: 15, marginBottom: 15, fontWeight: 'bold' }}>To Date</Text>
+              <DatePicker
+                style={{ flex: 1 }}
+                disabled={!editMode}
+                date={endDate}
+                mode='date'
+                showIcon={false}
+                placeholder='select date'
+                confirmBtnText='Confirm'
+                cancelBtnText='Cancel'
+                customStyles={{
+                  dateIcon: null,
+                  disabled: {
+                    backgroundColor: Colors.disableInputBackground,
+                    alignItems: 'flex-start',
+                    justifyContent: 'center',
+                    paddingLeft: 10,
+                    borderWidth: 1,
+                    borderColor: 'gray',
+                    color: 'black',
+                    borderRadius: 4,
+                    paddingRight: 30, // to ensure the text is never behind the icon
+                  },
+                  dateInput: {
+                    backgroundColor: 'white',
+                    alignItems: 'flex-start',
+                    justifyContent: 'center',
+                    paddingLeft: 10,
+                    borderWidth: 1,
+                    borderColor: 'gray',
+                    color: 'black',
+                    borderRadius: 4,
+                    paddingRight: 30, // to ensure the text is never behind the icon
+                  },
+                  dateText: {
+                    fontSize: 16,
+                    color: 'black',
+                  },
+                  btnTextConfirm: {
+                    color: Colors.tintColor,
+                    fontWeight: '600',
+                  },
+                  btnTextCancel: {
+                    color: Colors.tintColor,
+                    fontWeight: '600',
+                  },
+                }}
+                onDateChange={(date) => this.setState({ endDate: date })}
+              />
+            </View>
+          </View>
+          <FlatList />
         </View>
+        {/* <View style={styles.meetingInformation}>
+          <Text style={{ fontSize: 20, fontWeight: '600', margin: 20, color: 'white' }}>Meeting Information</Text>
+          <View style={{ alignItems: 'flex-start', padding: 30 }}>
+            <Text style={{ fontSize: 16, fontWeight: '600', margin: 20, color: 'white' }}>Time: </Text>
+            <Text style={{ fontSize: 16, fontWeight: '600', margin: 20, color: 'white' }}>Place: </Text>
+          </View>
+        </View> */}
       </NativeBaseComponent.Content>
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  userInfo: state.authReducer.userInfo,
+  groupInfo: state.groupReducer.groupInformation,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  reloadListGroup: () => dispatch(listGroup()),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(GroupDetailScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -213,12 +338,12 @@ const styles = StyleSheet.create({
   },
   avatar: {
     // flex: 1,
-    // width: 80,
-    // height: 80,
-    // borderRadius: 40,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     borderWidth: 4,
     // marginBottom: 10,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     alignSelf: 'center',
   },
   name: {
@@ -247,5 +372,11 @@ const styles = StyleSheet.create({
     color: 'black',
     borderRadius: 4,
     paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  meetingInformation: {
+    backgroundColor: Colors.tintColor,
+    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
 });

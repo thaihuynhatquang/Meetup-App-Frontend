@@ -10,6 +10,26 @@ import axios from 'axios';
 import { API_URL } from '../../constants/services';
 import { Alert } from 'react-native';
 
+export const updateGroup = (groupInformation) => {
+  return (dispatch, getState) => {
+    dispatch(fetchGroupStarted());
+    axios({
+      method: 'put',
+      url: `${API_URL}/group/updateGroupInfo/`,
+      data: groupInformation,
+      config: { headers: { 'Content-Type': 'multipart/form-data' } },
+    })
+      .then((res) => {
+        let data = res.data;
+        dispatch(fetchGroupSuccess(data));
+      })
+      .catch((err) => {
+        Alert.alert('Timeout of 0ms Exceeded. Server Error');
+        dispatch(fetchGroupFailure(err.message));
+      });
+  };
+};
+
 export const createGroup = (groupInformation) => {
   return (dispatch, getState) => {
     dispatch(fetchGroupStarted());

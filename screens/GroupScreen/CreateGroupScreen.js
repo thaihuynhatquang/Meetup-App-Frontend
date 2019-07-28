@@ -5,6 +5,7 @@ import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
 import * as ImagePicker from 'expo-image-picker';
 import RNPickerSelect from 'react-native-picker-select';
+import DatePicker from 'react-native-datepicker';
 
 import { categoryPlaces } from '../../data/SampleData';
 import TextSize from '../../constants/TextSize';
@@ -53,6 +54,8 @@ class CreateGroupScreen extends Component {
     };
 
     this.state = {
+      startDate: null,
+      endDate: null,
       groupAvatar: null,
       description: null,
       groupName: null,
@@ -102,6 +105,9 @@ class CreateGroupScreen extends Component {
     bodyFormData.append('category', groupInformation.category);
     bodyFormData.append('description', groupInformation.description);
     bodyFormData.append('groupName', groupInformation.groupName);
+    bodyFormData.append('startDate', groupInformation.startDate);
+    bodyFormData.append('endDate', groupInformation.endDate);
+
     await this.props.onCreateGroup(bodyFormData);
 
     setTimeout(() => {
@@ -117,7 +123,9 @@ class CreateGroupScreen extends Component {
       this.state.groupAvatar === null ||
       this.state.description === null ||
       this.state.groupName === null ||
-      this.state.category === null;
+      this.state.category === null ||
+      this.state.startDate === null ||
+      this.state.endDate === null;
     return (
       <View style={styles.container}>
         <View style={styles.header}>
@@ -170,6 +178,62 @@ class CreateGroupScreen extends Component {
               this.inputRefs.category = el;
             }}
           />
+          <View
+            style={{
+              marginTop: 15,
+              marginBottom: 15,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+            }}>
+            <View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+              <Text style={{ marginBottom: 15, fontWeight: 'bold' }}>From Date</Text>
+              <DatePicker
+                style={{ width: Layout.window.width / 3 }}
+                date={this.state.startDate}
+                mode='date'
+                placeholder='select date'
+                confirmBtnText='Confirm'
+                cancelBtnText='Cancel'
+                showIcon={false}
+                customStyles={{
+                  btnTextConfirm: {
+                    color: Colors.tintColor,
+                    fontWeight: '600',
+                  },
+                  btnTextCancel: {
+                    color: Colors.tintColor,
+                    fontWeight: '600',
+                  },
+                }}
+                onDateChange={(date) => this.setState({ startDate: date })}
+              />
+            </View>
+            <View style={{ flexDirection: 'column', marginLeft: 50, alignItems: 'flex-start' }}>
+              <Text style={{ marginBottom: 15, fontWeight: 'bold' }}>To Date</Text>
+              <DatePicker
+                style={{ width: Layout.window.width / 3 }}
+                date={this.state.endDate}
+                mode='date'
+                showIcon={false}
+                placeholder='select date'
+                confirmBtnText='Confirm'
+                cancelBtnText='Cancel'
+                customStyles={{
+                  dateIcon: null,
+                  btnTextConfirm: {
+                    color: Colors.tintColor,
+                    fontWeight: '600',
+                  },
+                  btnTextCancel: {
+                    color: Colors.tintColor,
+                    fontWeight: '600',
+                  },
+                }}
+                onDateChange={(date) => this.setState({ endDate: date })}
+              />
+            </View>
+          </View>
           <View style={{ alignItems: 'center' }}>
             <Button
               title='Continue'
@@ -183,7 +247,10 @@ class CreateGroupScreen extends Component {
                   groupName: this.state.groupName,
                   category: this.state.category,
                   adminEmail: this.props.userInfo.userName,
+                  startDate: new Date(this.state.startDate).getTime(),
+                  endDate: new Date(this.state.endDate).getTime(),
                 };
+
                 this.createNewGroup(groupInformation);
               }}
             />
@@ -214,6 +281,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flex: 1,
     backgroundColor: Colors.tintColor,
   },
   headerContent: {
@@ -221,12 +289,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    width: 130,
-    height: 130,
-    borderRadius: 63,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     borderWidth: 4,
     borderColor: 'white',
-    marginBottom: 10,
+    resizeMode: 'contain',
+    alignSelf: 'center',
   },
   name: {
     fontSize: 22,
@@ -255,6 +324,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.tintColor,
     shadowColor: Colors.tintColor,
   },
+  datePicker: {},
 });
 
 const pickerSelectStyles = StyleSheet.create({

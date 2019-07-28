@@ -6,17 +6,26 @@ import Layout from '../constants/Layout';
 import TextSize from '../constants/TextSize';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import DatePicker from 'react-native-datepicker';
-
-export default class DateTimePickerModal extends Component {
+import { connect } from 'react-redux';
+import { updateFreetime } from '../store/actions/timeLocationAction';
+class DateTimePickerModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
       chosenTime: [],
+      chosenShowTime: [],
       currentDate: null,
       currentStartTime: '0',
       currentEndTime: '0',
     };
   }
+
+  _onUpdateListFreetime() {
+    const groupName = this.props.groupInfo.groupName;
+    this.props.updateFreetime(groupName, this.state.chosenTime);
+    this.props.setListFreeTime();
+  }
+
   setDate(newDate) {
     this.setState({ currentDate: newDate });
   }
@@ -40,13 +49,13 @@ export default class DateTimePickerModal extends Component {
       parseInt(currentStartTime) >= parseInt(currentEndTime);
     const renderListTime = (
       <FlatList
-        data={this.state.chosenTime}
+        data={this.state.chosenShowTime}
         extraData={this.state}
         ItemSeparatorComponent={() => {
           return <View style={styles.separator} />;
         }}
         keyExtractor={(item) => {
-          return this.state.chosenTime.indexOf(item).toString();
+          return this.state.chosenShowTime.indexOf(item).toString();
         }}
         renderItem={(listTime) => {
           const time = listTime.item;
@@ -100,9 +109,7 @@ export default class DateTimePickerModal extends Component {
           <Right>
             <View style={{ justifyContent: 'center' }}>
               <Button
-                onPress={() => {
-                  this.props.setListFreeTime();
-                }}
+                onPress={() => this._onUpdateListFreetime()}
                 small
                 rounded
                 style={{ backgroundColor: this.state.chosenTime.length > 0 ? Colors.tintColor : undefined }}
@@ -233,15 +240,22 @@ export default class DateTimePickerModal extends Component {
                     0,
                   );
                   await this.setState({
-                    chosenTime: [
-                      ...this.state.chosenTime,
+                    chosenShowTime: [
+                      ...this.state.chosenShowTime,
                       {
                         startChosenTime: startChosenTime,
                         endChosenTime: endChosenTime,
                       },
                     ],
+                    chosenTime: [
+                      ...this.state.chosenTime,
+                      {
+                        fromTime: parseInt(startChosenTime.getTime()),
+                        toTime: parseInt(endChosenTime.getTime()),
+                      },
+                    ],
                     currentDate: null,
-                    startChosenTime: '0',
+                    currentStartTime: '0',
                     currentEndTime: '0',
                   });
                 }}>
@@ -250,25 +264,24 @@ export default class DateTimePickerModal extends Component {
             </View>
             {renderListTime}
           </View>
-          {/* <View style={{ padding: 20 }}>
-            <ScrollView horizontal={true}>
-              <PureChart
-                data={[
-                  {
-                    seriesName: 'series1',
-                    data: timeListData,
-                    color: Colors.tintColor,
-                  },
-                ]}
-                type='bar'
-              />
-            </ScrollView>
-          </View> */}
         </Content>
       </Container>
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  groupInfo: state.groupReducer.groupInformation,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  updateFreetime: (groupName, listFreeTimes) => dispatch(updateFreetime(groupName, listFreeTimes)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(DateTimePickerModal);
 
 const styles = StyleSheet.create({
   button: {

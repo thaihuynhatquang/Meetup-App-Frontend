@@ -32,6 +32,7 @@
     "react-native-datepicker": "^1.7.2",
     "react-native-elements": "^1.1.0",
     "react-native-gifted-chat": "^0.9.11",
+    "react-native-maps": "^0.24.2",
     "react-native-material-cards": "^1.0.9",
     "react-native-picker-select": "^6.3.0",
     "react-native-pure-chart": "0.0.24",

@@ -7,8 +7,10 @@ import TextSize from '../constants/TextSize';
 import axios from 'axios';
 import { HereMapsAPI, appCode, appID, UETAddress } from '../constants/HeremapsApi';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { connect } from 'react-redux';
+import { updateLocation } from '../store/actions/timeLocationAction';
 
-export default class DateTimePickerModal extends Component {
+class LocationPickerModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -18,6 +20,12 @@ export default class DateTimePickerModal extends Component {
       chosenPlace: {},
     };
   }
+
+  _onUpdateLocation = () => {
+    const groupName = this.props.groupInfo.groupName;
+    this.props.updateLocation(groupName, this.state.chosenPlace);
+    this.props.setLocation();
+  };
 
   _handleSearchEvent = (event) => {
     value = event.nativeEvent.text;
@@ -41,8 +49,14 @@ export default class DateTimePickerModal extends Component {
     return (
       <TouchableOpacity
         onPress={async () => {
-          await this.setState({ chosenPlace: item.position });
-          this.props.setLocation();
+          await this.setState({
+            chosenPlace: {
+              lat: item.position[0],
+              lon: item.position[1],
+            },
+          });
+          this._onUpdateLocation();
+          console.log(item);
         }}>
         <ListItem thumbnail selected noIndent>
           <Body>
@@ -118,6 +132,19 @@ export default class DateTimePickerModal extends Component {
     );
   }
 }
+
+const mapStateToProps = (state) => ({
+  groupInfo: state.groupReducer.groupInformation,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  updateLocation: (groupName, location) => dispatch(updateLocation(groupName, location)),
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(LocationPickerModal);
 
 const styles = StyleSheet.create({
   button: {

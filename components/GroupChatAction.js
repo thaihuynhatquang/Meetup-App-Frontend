@@ -34,6 +34,7 @@ export default class CustomActions extends React.Component {
     const options = this.props.isAdminGroup
       ? ['Cancel', 'Set Location', 'Set List Free Time', 'Set Plan For Meetup', 'Add member']
       : ['Cancel', 'Set Location', 'Set List Free Time'];
+    console.log(this.props.isAdminGroup);
     const cancelButtonIndex = 0;
     this.context.actionSheet().showActionSheetWithOptions(
       {
